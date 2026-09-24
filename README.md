@@ -26,10 +26,14 @@ Official releases are signed with Developer ID and notarized by Apple.
 See [installation and operation](docs/installation.md) for manual installation,
 upgrades, rollback, removal, shell completion, profiles, and Agent Skill setup.
 
-## First commands
+## Get started
+
+Have an invitation code? Follow [Get started with an invitation](docs/getting-started.md)
+to redeem it, create a private personal repository, and push your first commit.
+
+For users who already have service access, these commands discover and clone a repository:
 
 ```sh
-gsp auth login YOUR_HANDLE
 gsp auth status --json
 gsp repo search --json YOUR_QUERY
 gsp repo clone OWNER/REPOSITORY
