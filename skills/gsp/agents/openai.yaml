@@ -1,0 +1,4 @@
+interface:
+  display_name: "gsp"
+  short_description: "Operate Gitosphere safely with the installed gsp CLI"
+  default_prompt: "Use $gsp to inspect the target repository and complete my Gitosphere task with the installed CLI."
