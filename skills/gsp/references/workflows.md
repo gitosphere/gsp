@@ -146,13 +146,20 @@ then use the installed `pr review` options (`--comment`, `--approve`, or
 Do not add a guessed `--dry-run` to review commands. Keep verification evidence
 separate from unverified scope and never infer approval from a request to read.
 
+The current server fixes `requiredApprovals` at zero. A PR without qualifying
+approvals reports `not_required`, not `approved`; inspect `mergeable` and
+`blockingReasons` as well. Change requests, blocking findings, failed verification,
+merge permissions, and head matching still apply. Older clients cannot decode
+`not_required`; install a compatible CLI before updating the server. Repository
+workflow instructions may still require a review independently of server policy.
+
 A request to create a PR does not authorize merging it. For an authorized merge,
-inspect `pr status` and `pr view`, pin the full reviewed head SHA, and verify the
+inspect `pr status` and `pr view`, pin the full expected head SHA, and verify the
 merge with the supported dry-run before applying it:
 
 ```sh
 gsp --profile PROFILE pr merge NUMBER --repo OWNER/REPO \
-  --match-head-commit REVIEWED_FULL_SHA --idempotency-key REQUEST_KEY \
+  --match-head-commit EXPECTED_FULL_SHA --idempotency-key REQUEST_KEY \
   --dry-run --json --non-interactive
 ```
 
@@ -162,7 +169,7 @@ do not bypass the gate. A merge can succeed while auto-closing Issues fails:
 stdout retains the merge result and `issueCloseResults`, stderr can report
 `IssueAutoCloseIncomplete`, and the process exits `3`. Inspect those results
 before retrying. Resume supported incomplete work with the same profile,
-repository, PR, reviewed SHA, and key; do not create another merge or reinterpret
+repository, PR, expected SHA, and key; do not create another merge or reinterpret
 the entire operation as failed. Verify final PR and Issue states separately.
 
 ## Failure handling

@@ -1,0 +1,26 @@
+{
+  "apiContract": "83aa45f659be1b1949cc4c1c464fb5234e99f0182fff5e41586f8903d4faffc3",
+  "artifact": "gsp-0.1.1-macos-arm64.dmg",
+  "caskSHA256": "37add0d67aa1a1533334372aa12c54a0d2462b84594dc44a6c25bf3a7a8bb0f5",
+  "documentationFiles": {
+    "docs/README.md": "53b4fb8d338576a9e3e5674f06557d2138f93ac683d4435c5e1d74c6b2c0864a",
+    "docs/docs/installation.md": "66ab767327dbb144f2680b53c246d784e5ba110c13171022c5a3157af4499239"
+  },
+  "documentationRepository": "https://github.com/gitosphere/gsp.git",
+  "documentationRevision": "00d15a6c90b0f3948b7edc604de7b14e6753716d",
+  "files": {
+    "completions/_gsp": "9487b21951d7c638a623e2ad852f8f5f7949a0a8c255afe173fbcf5f70c49121",
+    "completions/gsp.bash": "42b4af39df138051e6c807fba461ddae3bb6493c778a39725c61c531605f524f",
+    "completions/gsp.fish": "f4a6767488e18f1607360d1f7f02098cb4eeea4d145cc601fe3657032ed8c64d",
+    "releases/0.1.1/acceptance.json": "0fcba39bb56aeb0f5aa567987212a38589a94a0cccb57ff603b8aee52186717c",
+    "releases/0.1.1/release-notes.md": "15791e5bdae9f09957b527519d35ca78b9e861c9798fa8fcc4e4c8ca80e42fbd",
+    "skills/gsp/SKILL.md": "18e45fe05b4af9ea9bd9b5afc61cbadbeb1425e4050466ed8dbbf570c39df038",
+    "skills/gsp/agents/openai.yaml": "8894e1b081155adeb94806cdad9a5a7d3a1c5af949f686c5deec63b0da986b7f",
+    "skills/gsp/references/workflows.md": "5441b1f3bbb16955400d2d2bd718791a46b86b0cea123b331704e56d18d6183f"
+  },
+  "schemaVersion": 1,
+  "sha256": "e771f9990384508085224d71785e3288365d96469facc32d782127ef77d709c0",
+  "sourceRevision": "783f3f632ef8ff2016d5cf96c59dbfe29cfa12a8",
+  "teamID": "SPTF653B4J",
+  "version": "0.1.1"
+}

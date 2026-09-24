@@ -476,7 +476,7 @@ complete -c 'gsp' -n '__gsp_should_offer_completions_for_flags_or_options "gsp r
 complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'create' -d 'Create a repository and publish its AT Protocol record'
 complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'view' -d ''
 complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'list' -d ''
-complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'search' -d 'Search public repositories without requiring a signed-in profile'
+complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'search' -d 'Search public repositories using the selected profile when configured'
 complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'deactivate' -d ''
 complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'clone' -d 'Clone a Gitosphere repository with ephemeral Git grants'
 complete -c 'gsp' -n '__gsp_should_offer_completions_for_positional "gsp repo" -eq 1' -fa 'remote' -d 'Manage Gitosphere Git remotes'

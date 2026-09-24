@@ -498,7 +498,7 @@ _gsp_repo() {
             'create:Create a repository and publish its AT Protocol record'
             'view:'
             'list:'
-            'search:Search public repositories without requiring a signed-in profile'
+            'search:Search public repositories using the selected profile when configured'
             'deactivate:'
             'clone:Clone a Gitosphere repository with ephemeral Git grants'
             'remote:Manage Gitosphere Git remotes'
