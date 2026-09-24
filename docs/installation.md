@@ -1,8 +1,9 @@
 # Installation and operation
 
 `gsp` is available for macOS on Apple Silicon (arm64). Check the
-[release notes](https://github.com/gitosphere/gsp/releases) for supported macOS
-versions and server compatibility.
+[Homebrew Cask](https://github.com/gitosphere/homebrew-tap/blob/main/Casks/gsp.rb)
+for the supported macOS version and [GitHub Releases](https://github.com/gitosphere/gsp/releases)
+for available artifacts.
 
 ## Homebrew
 
@@ -108,7 +109,9 @@ If you use multiple profiles, sign out of each one you intend to remove.
 ## Manual installation and rollback
 
 Download `gsp-VERSION-macos-arm64.dmg` from that version's GitHub Release.
-Compare its SHA-256 with the release notes and `releases/VERSION/receipt.json`.
+Compare its SHA-256 with the `sha256` value in the matching version of
+[`gitosphere/homebrew-tap`'s Cask](https://github.com/gitosphere/homebrew-tap/blob/main/Casks/gsp.rb).
+For an older version, use the Cask revision that specified that version.
 Do not disable Gatekeeper or strip quarantine attributes to make a failed check pass.
 
 ```sh
