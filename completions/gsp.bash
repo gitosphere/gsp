@@ -187,13 +187,13 @@ _gsp() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|help)
+    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|body-inspect|help)
         # Offer subcommand argument completions
         "_gsp_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr completion help' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr completion body-inspect help' -- "${cur}"))
         ;;
     esac
 }
@@ -483,9 +483,9 @@ _gsp_org_get() {
 
 _gsp_org_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -500,10 +500,10 @@ _gsp_org_list() {
         __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -577,9 +577,9 @@ _gsp_member_add() {
 
 _gsp_member_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --organization --organization-id -R --repo --repository-id --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --organization --organization-id -R --repo --repository-id --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -606,10 +606,10 @@ _gsp_member_list() {
     '--repository-id')
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -770,9 +770,9 @@ _gsp_repo_view() {
 
 _gsp_repo_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -787,10 +787,10 @@ _gsp_repo_list() {
         __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -800,7 +800,7 @@ _gsp_repo_search() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 1
 
     # Offer option value completions
@@ -815,10 +815,10 @@ _gsp_repo_search() {
         __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -1135,9 +1135,9 @@ _gsp_space_member_add() {
 
 _gsp_space_member_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --space --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --space --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -1155,10 +1155,10 @@ _gsp_space_member_list() {
     '--space')
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -1374,9 +1374,9 @@ _gsp_quota_show() {
 
 _gsp_quota_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -1391,10 +1391,10 @@ _gsp_quota_list() {
         __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -1558,9 +1558,9 @@ _gsp_invite_create() {
 
 _gsp_invite_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -1575,10 +1575,10 @@ _gsp_invite_list() {
         __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -1743,9 +1743,9 @@ _gsp_access_status() {
 
 _gsp_access_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -1760,10 +1760,10 @@ _gsp_access_list() {
         __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -1869,9 +1869,9 @@ _gsp_audit() {
 
 _gsp_audit_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -1886,10 +1886,10 @@ _gsp_audit_list() {
         __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -1960,9 +1960,9 @@ _gsp_issue_create() {
 
 _gsp_issue_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --has-children --blocked --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --has-children --blocked --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --cursor --limit --skip --max-count --state --parent --related --blocking --blocked-by)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --skip --max-count --state --parent --related --blocking --blocked-by)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -1978,12 +1978,6 @@ _gsp_issue_list() {
         return
         ;;
     '-R'|'--repo')
-        return
-        ;;
-    '--cursor')
-        return
-        ;;
-    '--limit')
         return
         ;;
     '--skip')
@@ -2277,9 +2271,9 @@ _gsp_pr_create() {
 
 _gsp_pr_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --state --author --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --state --author --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -2303,10 +2297,10 @@ _gsp_pr_list() {
     '--author')
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -2464,7 +2458,7 @@ _gsp_pr_comments() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --round --cursor --limit)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --round --skip --max-count)
     __gsp_offer_flags_options 1
 
     # Offer option value completions
@@ -2485,10 +2479,10 @@ _gsp_pr_comments() {
     '--round')
         return
         ;;
-    '--cursor')
+    '--skip')
         return
         ;;
-    '--limit')
+    '--max-count')
         return
         ;;
     esac
@@ -2604,6 +2598,31 @@ _gsp_completion() {
     case "${positional_number}" in
     1)
         __gsp_add_completions -W 'bash'$'\n''zsh'$'\n''fish'
+        return
+        ;;
+    esac
+}
+
+_gsp_body-inspect() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store --body-file)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '--body-file')
         return
         ;;
     esac

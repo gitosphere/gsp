@@ -64,7 +64,7 @@ gsp --profile PROFILE member add --repo OWNER/REPO --principal DID --role reader
   --idempotency-key REQUEST_KEY --dry-run --json --non-interactive
 gsp --profile PROFILE access explain --kind repository --repository-id REPOSITORY_ID \
   --principal DID --action read --json --non-interactive
-gsp --profile PROFILE audit list --limit 50 --json --non-interactive
+gsp --profile PROFILE audit list --max-count 50 --json --non-interactive
 ```
 
 Organization commands resolve public names or explicit immutable IDs. Member
@@ -82,19 +82,14 @@ limited to the requested evidence; do not export raw audit data unnecessarily.
 
 ## Pagination and structured output
 
-Successful structured responses use `schemaVersion` and `result`, with an
-optional request ID. List results expose `result.page.nextCursor`. Feed that
-value unchanged into the same command's `--cursor`, retaining the profile,
-repository, and filters. Stop when there is no next cursor or the requested
-bound is reached. Do not decode cursors or treat `--limit` as a total-result cap.
-
-`issue list` can retrieve multiple pages internally. Its `--skip` and
-`--max-count` control the returned selection; `--limit` controls each API page.
-Read the actual returned cursor before fetching more. State filters matter:
-for example, use `--state all` when the request includes closed Issues and the
-installed command supports it. If a cursor becomes stale, start a fresh listing
-with the same filters and deduplicate by stable identity; do not splice cursors
-from different queries or claim a complete snapshot across concurrent changes.
+Successful structured responses include `schemaVersion` and `result`, and may
+include a request ID. Lists and searches use `--skip` and `--max-count` to
+select the returned range. By default, results start at the beginning and
+include up to 50 items. The CLI fetches all required API pages internally and
+does not include a continuation cursor in JSON. To request a later range,
+increase `--skip` while keeping the same profile, repository, and filters. Do
+not claim a consistent snapshot across concurrent changes. Specify
+`--state all` to include closed Issues.
 
 ## Issues and Markdown writes
 

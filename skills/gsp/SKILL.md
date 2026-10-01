@@ -30,8 +30,7 @@ subsequent history, branch, commit, fetch, and push operations.
    rewrite a development checkout's remote, profile, realm, or credential helper
    to access another environment. Use a separate worktree or checkout when needed.
 4. Prefer `--json` for structured reads and `--non-interactive` for automation
-   where supported. Inspect the process status and both output streams. Follow
-   opaque cursors when the requested result spans pages; report incomplete reads.
+   where supported. Inspect the process status and both output streams. Use `--skip` and `--max-count` to select a list range; report incomplete reads.
 
 Read [references/workflows.md](references/workflows.md) for the relevant workflow,
 including authentication recovery, pagination, writes, PRs, and failure handling.

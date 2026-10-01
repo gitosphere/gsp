@@ -70,13 +70,14 @@ _gsp() {
             'issue:Manage issues in a Gitosphere repository'
             'pr:Manage pull requests in a Gitosphere repository'
             'completion:Generate a shell completion script'
+            'body-inspect:Inspect a legacy Markdown body before ZIP migration'
             'help:Show subcommand help information.'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|help)
+        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|body-inspect|help)
             "_gsp_${words[1]}" && ret=0
             ;;
         esac
@@ -341,8 +342,9 @@ _gsp_org_list() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of resources to return (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -422,8 +424,9 @@ _gsp_member_list() {
         '--organization-id[Immutable Organization ID]:organization-id:'
         '(-R --repo)'{-R,--repo}'[Repository using OWNER/NAME]:repo:'
         '--repository-id[Immutable Repository ID]:repository-id:'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of resources to return (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -574,8 +577,9 @@ _gsp_repo_list() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--cursor[Opaque pagination cursor]:cursor:'
-        '--limit[Maximum results (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -594,8 +598,8 @@ _gsp_repo_search() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--cursor[Opaque pagination cursor]:cursor:'
-        '--limit[Maximum results (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
         ':query:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
@@ -898,8 +902,9 @@ _gsp_space_member_list() {
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
         '--space[Permissioned Data Space URI]:space:'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of members to return (1...1000)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -990,7 +995,7 @@ _gsp_traffic_pause() {
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
         '--dry-run[Describe the operation without applying it]'
         '--idempotency-key[Idempotency key for a mutation request]:idempotency-key:'
-        '*--target[Repeat for auth, invite, api-write, git-read or git-write]:target:'
+        '*--target[Repeat for auth, invite, api-write, body-write, git-read, git-write or git-push]:target:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1011,7 +1016,7 @@ _gsp_traffic_resume() {
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
         '--dry-run[Describe the operation without applying it]'
         '--idempotency-key[Idempotency key for a mutation request]:idempotency-key:'
-        '*--target[Repeat for auth, invite, api-write, git-read or git-write]:target:'
+        '*--target[Repeat for auth, invite, api-write, body-write, git-read, git-write or git-push]:target:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1103,8 +1108,9 @@ _gsp_quota_list() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of resources to return (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1245,8 +1251,9 @@ _gsp_invite_list() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of resources to return (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1389,8 +1396,9 @@ _gsp_access_list() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of resources to return (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1500,8 +1508,9 @@ _gsp_audit_list() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of resources to return (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1583,10 +1592,8 @@ _gsp_issue_list() {
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
         '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of resources to return (1...100)]:limit:'
-        '--skip[Number of resources to skip before returning results]:skip:'
-        '--max-count[Maximum number of resources to return across pages]:max-count:'
+        '--skip[Number of issues to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of issues to return after skipping (>=1)]:max-count:'
         '--state[Filter issues by state (open, closed, or all)]:state:{__gsp_complete "${___state[@]}"}'
         '--parent[Filter by parent issue number]:parent:'
         '--related[Filter by related issue number]:related:'
@@ -1594,6 +1601,7 @@ _gsp_issue_list() {
         '--blocked-by[Filter by an issue blocking this issue]:blocked-by:'
         '--has-children[Filter to issues with children]'
         '--blocked[Filter to issues with open blockers]'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1820,8 +1828,9 @@ _gsp_pr_list() {
         '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
         '--state[Filter by state\: open, closed, merged, or all]:state:'
         '--author[Filter by author DID]:author:'
-        '--cursor[Opaque cursor returned by a previous list request]:cursor:'
-        '--limit[Maximum number of pull requests to return (1...100)]:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1944,8 +1953,8 @@ _gsp_pr_comments() {
         '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
         ':number:'
         '--round:round:'
-        '--cursor:cursor:'
-        '--limit:limit:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -2031,6 +2040,25 @@ _gsp_completion() {
     local -ar _shell=('bash' 'zsh' 'fish')
     local -ar arg_specs=(
         ':shell:{__gsp_complete "${_shell[@]}"}'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_body-inspect() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--body-file[File containing the original Markdown body]:body-file:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
