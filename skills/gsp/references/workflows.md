@@ -24,10 +24,15 @@ user consent. For SSH, `--no-browser` and `--callback-port PORT` support a brows
 on the user's machine with a matching SSH port forward. Treat the authorization
 URL as sensitive and do not copy it into Issues, PRs, or validation artifacts.
 
-Storage selection is explicit. `--session-store file` selects protected local
-JSON storage, not encrypted storage; respect an existing profile's selection.
-Do not switch stores or profiles merely to bypass a failure. Switching stores
-uses a new OAuth login and can require access to the old store. With
+For `auth login`, omitting `--session-store` selects the platform default,
+even when the profile currently records another store. On macOS this is
+Keychain; Linux follows the default documented by the repository's
+authentication guide. Specify `--session-store file` to choose file storage
+for that login. The selected store is recorded in the profile after successful
+login; status and logout use that recorded store. File storage is protected
+local JSON, not encrypted storage. Do not switch stores or profiles merely to
+bypass a failure. Switching stores uses a new OAuth login and can require
+access to the old store. With
 `sessionStoreCleanupPending: true`, use the documented same-profile login
 recovery; do not delete session files or lock files manually. File-store
 diagnostics may inspect ownership, permissions, and symlinks without reading
