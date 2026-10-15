@@ -143,7 +143,21 @@ with a file and confirm it through read-back after creation or editing.
 Reviews and comments are writes. If requested, inspect the current PR and round,
 then use the installed `pr review` options (`--comment`, `--approve`, or
 `--request-changes`) and body-file support. Supply a stable key where supported.
-Do not add a guessed `--dry-run` to review commands. Keep verification evidence
+Do not add a guessed `--dry-run` to review or `pr comment` commands.
+
+```sh
+gsp --profile PROFILE pr comments NUMBER --repo OWNER/REPO --json --non-interactive
+gsp --profile PROFILE pr comment NUMBER --repo OWNER/REPO --body-file comment.md \
+  --idempotency-key REQUEST_KEY --json --non-interactive
+gsp --profile PROFILE pr edit-comment NUMBER --repo OWNER/REPO --comment COMMENT_URI \
+  --body-file comment.md --idempotency-key REQUEST_KEY --dry-run --json --non-interactive
+```
+
+`pr comment` takes `--path`, `--side`, `--line`, and `--start-line` for a finding on
+the diff, and `--blocking` for one that must be resolved before merging. Only a
+comment's author can edit it with `pr edit-comment`; take its `uri` from
+`pr comments --json`. Editing replaces the body only and keeps the round and
+position. Read the comment back after creating or editing it. Keep verification evidence
 separate from unverified scope and never infer approval from a request to read.
 
 The current server fixes `requiredApprovals` at zero. A PR without qualifying

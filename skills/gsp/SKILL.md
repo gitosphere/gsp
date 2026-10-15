@@ -34,6 +34,8 @@ subsequent history, branch, commit, fetch, and push operations.
 
 Read [references/workflows.md](references/workflows.md) for the relevant workflow,
 including authentication recovery, pagination, writes, PRs, and failure handling.
+[references/commands.md](references/commands.md) lists every command shown by
+`gsp --help`, with its purpose and the role it usually needs.
 
 ## Authorization and data handling
 

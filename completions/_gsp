@@ -70,14 +70,13 @@ _gsp() {
             'issue:Manage issues in a Gitosphere repository'
             'pr:Manage pull requests in a Gitosphere repository'
             'completion:Generate a shell completion script'
-            'body-inspect:Inspect a legacy Markdown body before ZIP migration'
             'help:Show subcommand help information.'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|body-inspect|help)
+        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|help)
             "_gsp_${words[1]}" && ret=0
             ;;
         esac
@@ -103,15 +102,12 @@ _gsp_auth() {
             'status:Show non-secret authentication status'
             'logout:Delete the selected profile'\''s session'
             'use:Select the default profile without changing its credentials'
-            'spaces-alpha-smoke:Run a destructive, self-cleaning smoke test against a Spaces Alpha PDS'
-            'spaces-access-smoke:Verify direct PDS read/write permissions in temporary Spaces'
-            'permission-set-probe:Verify that a PDS accepts an external OAuth permission set during PAR'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        login|status|logout|use|spaces-alpha-smoke|spaces-access-smoke|permission-set-probe)
+        login|status|logout|use)
             "_gsp_auth_${words[1]}" && ret=0
             ;;
         esac
@@ -191,68 +187,6 @@ _gsp_auth_use() {
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
         ':profile:'
-        '--version[Show the version.]'
-        '(-h --help)'{-h,--help}'[Show help information.]'
-    )
-    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
-
-    return "${ret}"
-}
-
-_gsp_auth_spaces-alpha-smoke() {
-    local -i ret=1
-    local -ar ___session_store=('keychain' 'file')
-    local -ar arg_specs=(
-        '--json[Emit stable machine-readable JSON]'
-        '--verbose[Emit diagnostic details]'
-        '--non-interactive[Disable all interactive prompts]'
-        '--profile[Select a configured profile]:profile:'
-        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
-        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--pds[Spaces Alpha PDS origin]:pds:'
-        '--did-document-origin[Loopback fixture DID document origin for local development]:did-document-origin:'
-        '--contract[Permission contract\: bulletin, gitosphere, or gitosphere-test]:contract:'
-        '--version[Show the version.]'
-        '(-h --help)'{-h,--help}'[Show help information.]'
-    )
-    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
-
-    return "${ret}"
-}
-
-_gsp_auth_spaces-access-smoke() {
-    local -i ret=1
-    local -ar ___session_store=('keychain' 'file')
-    local -ar arg_specs=(
-        '--json[Emit stable machine-readable JSON]'
-        '--verbose[Emit diagnostic details]'
-        '--non-interactive[Disable all interactive prompts]'
-        '--profile[Select a configured profile]:profile:'
-        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
-        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--member-profile[Signed-in non-owner profile used for direct PDS operations]:member-profile:'
-        '--yes[Confirm temporary Space and record writes]'
-        '--dry-run[Validate profiles without refreshing sessions or contacting the PDS]'
-        '--version[Show the version.]'
-        '(-h --help)'{-h,--help}'[Show help information.]'
-    )
-    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
-
-    return "${ret}"
-}
-
-_gsp_auth_permission-set-probe() {
-    local -i ret=1
-    local -ar ___session_store=('keychain' 'file')
-    local -ar arg_specs=(
-        '--json[Emit stable machine-readable JSON]'
-        '--verbose[Emit diagnostic details]'
-        '--non-interactive[Disable all interactive prompts]'
-        '--profile[Select a configured profile]:profile:'
-        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
-        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--pds[PDS origin used for AT Protocol OAuth]:pds:'
-        '--permission-set[Permission-set Lexicon NSID]:permission-set:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1571,7 +1505,7 @@ _gsp_issue_create() {
         '(-b --body)'{-b,--body}'[Issue body]:body:'
         '(-F --body-file)'{-F,--body-file}'[Read the issue body from a file; use - for stdin]:body-file:'
         '(-e --editor)'{-e,--editor}'[Open an editor; the first line is the title and the remaining text is the body]'
-        '--parent[Set the parent issue after creation]:parent:'
+        '*--parent[Set the parent issue after creation]:parent:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1646,16 +1580,16 @@ _gsp_issue_edit() {
         '(-b --body)'{-b,--body}'[Set the issue body]:body:'
         '(-F --body-file)'{-F,--body-file}'[Read the issue body from a file; use - for stdin]:body-file:'
         '--editor[Open the configured editor to edit the title and body]'
-        '--parent[Set the parent issue]:parent:'
+        '*--parent[Set the parent issue]:parent:'
         '--remove-parent[Remove the current parent]'
-        '--add-sub-issue[Add a child issue]:add-sub-issue:'
-        '--remove-sub-issue[Remove a child issue]:remove-sub-issue:'
-        '--add-related[Add a related issue]:add-related:'
-        '--remove-related[Remove a related issue]:remove-related:'
-        '--add-blocking[Mark this issue as blocking another issue]:add-blocking:'
-        '--remove-blocking[Remove an issue blocked by this issue]:remove-blocking:'
-        '--add-blocked-by[Mark this issue as blocked by another issue]:add-blocked-by:'
-        '--remove-blocked-by[Remove an issue blocking this issue]:remove-blocked-by:'
+        '*--add-sub-issue[Add a child issue]:add-sub-issue:'
+        '*--remove-sub-issue[Remove a child issue]:remove-sub-issue:'
+        '*--add-related[Add a related issue]:add-related:'
+        '*--remove-related[Remove a related issue]:remove-related:'
+        '*--add-blocking[Mark this issue as blocking another issue]:add-blocking:'
+        '*--remove-blocking[Remove an issue blocked by this issue]:remove-blocking:'
+        '*--add-blocked-by[Mark this issue as blocked by another issue]:add-blocked-by:'
+        '*--remove-blocked-by[Remove an issue blocking this issue]:remove-blocked-by:'
         '--idempotency-key[Idempotency key; required with --non-interactive]:idempotency-key:'
         '--dry-run[Describe the operation without applying it]'
         '--version[Show the version.]'
@@ -1770,6 +1704,7 @@ _gsp_pr() {
             'edit:'
             'diff:Display the unified diff for a pull request round'
             'comment:'
+            'edit-comment:Replace the body of a comment you wrote'
             'comments:'
             'review:'
             'status:'
@@ -1779,7 +1714,7 @@ _gsp_pr() {
         ;;
     arg)
         case "${words[1]}" in
-        create|list|view|edit|diff|comment|comments|review|status|merge)
+        create|list|view|edit|diff|comment|edit-comment|comments|review|status|merge)
             "_gsp_pr_${words[1]}" && ret=0
             ;;
         esac
@@ -1940,6 +1875,31 @@ _gsp_pr_comment() {
     return "${ret}"
 }
 
+_gsp_pr_edit-comment() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':number:'
+        '--comment[AT URI of the comment to edit]:comment:'
+        '(-b --body)'{-b,--body}'[Set the comment body]:body:'
+        '(-F --body-file)'{-F,--body-file}'[Read the comment body from a file; use - for stdin]:body-file:'
+        '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
+        '--dry-run[Describe the operation without applying it]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
 _gsp_pr_comments() {
     local -i ret=1
     local -ar ___session_store=('keychain' 'file')
@@ -2040,25 +2000,6 @@ _gsp_completion() {
     local -ar _shell=('bash' 'zsh' 'fish')
     local -ar arg_specs=(
         ':shell:{__gsp_complete "${_shell[@]}"}'
-        '--version[Show the version.]'
-        '(-h --help)'{-h,--help}'[Show help information.]'
-    )
-    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
-
-    return "${ret}"
-}
-
-_gsp_body-inspect() {
-    local -i ret=1
-    local -ar ___session_store=('keychain' 'file')
-    local -ar arg_specs=(
-        '--json[Emit stable machine-readable JSON]'
-        '--verbose[Emit diagnostic details]'
-        '--non-interactive[Disable all interactive prompts]'
-        '--profile[Select a configured profile]:profile:'
-        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
-        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
-        '--body-file[File containing the original Markdown body]:body-file:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

@@ -187,13 +187,13 @@ _gsp() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|body-inspect|help)
+    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|help)
         # Offer subcommand argument completions
         "_gsp_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr completion body-inspect help' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr completion help' -- "${cur}"))
         ;;
     esac
 }
@@ -210,13 +210,13 @@ _gsp_auth() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    login|status|logout|use|spaces-alpha-smoke|spaces-access-smoke|permission-set-probe)
+    login|status|logout|use)
         # Offer subcommand argument completions
         "_gsp_auth_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'login status logout use spaces-alpha-smoke spaces-access-smoke permission-set-probe' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'login status logout use' -- "${cur}"))
         ;;
     esac
 }
@@ -313,90 +313,6 @@ _gsp_auth_use() {
         ;;
     '--session-store')
         __gsp_add_completions -W 'keychain'$'\n''file'
-        return
-        ;;
-    esac
-}
-
-_gsp_auth_spaces-alpha-smoke() {
-    repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
-    repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --pds --did-document-origin --contract)
-    __gsp_offer_flags_options 0
-
-    # Offer option value completions
-    case "${prev}" in
-    '--profile')
-        return
-        ;;
-    '--timeout-seconds')
-        return
-        ;;
-    '--session-store')
-        __gsp_add_completions -W 'keychain'$'\n''file'
-        return
-        ;;
-    '--pds')
-        return
-        ;;
-    '--did-document-origin')
-        return
-        ;;
-    '--contract')
-        return
-        ;;
-    esac
-}
-
-_gsp_auth_spaces-access-smoke() {
-    repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --yes --dry-run --version -h --help)
-    repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --member-profile)
-    __gsp_offer_flags_options 0
-
-    # Offer option value completions
-    case "${prev}" in
-    '--profile')
-        return
-        ;;
-    '--timeout-seconds')
-        return
-        ;;
-    '--session-store')
-        __gsp_add_completions -W 'keychain'$'\n''file'
-        return
-        ;;
-    '--member-profile')
-        return
-        ;;
-    esac
-}
-
-_gsp_auth_permission-set-probe() {
-    repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
-    repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --pds --permission-set)
-    __gsp_offer_flags_options 0
-
-    # Offer option value completions
-    case "${prev}" in
-    '--profile')
-        return
-        ;;
-    '--timeout-seconds')
-        return
-        ;;
-    '--session-store')
-        __gsp_add_completions -W 'keychain'$'\n''file'
-        return
-        ;;
-    '--pds')
-        return
-        ;;
-    '--permission-set')
         return
         ;;
     esac
@@ -1921,8 +1837,8 @@ _gsp_issue() {
 _gsp_issue_create() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --dry-run -e --editor --version -h --help)
-    repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --idempotency-key -t --title -b --body -F --body-file --parent)
+    repeating_options=(--parent)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --idempotency-key -t --title -b --body -F --body-file)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -2033,8 +1949,8 @@ _gsp_issue_view() {
 _gsp_issue_edit() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --editor --remove-parent --dry-run --version -h --help)
-    repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --title -b --body -F --body-file --parent --add-sub-issue --remove-sub-issue --add-related --remove-related --add-blocking --remove-blocking --add-blocked-by --remove-blocked-by --idempotency-key)
+    repeating_options=(--parent --add-sub-issue --remove-sub-issue --add-related --remove-related --add-blocking --remove-blocking --add-blocked-by --remove-blocked-by)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --title -b --body -F --body-file --idempotency-key)
     __gsp_offer_flags_options 1
 
     # Offer option value completions
@@ -2215,13 +2131,13 @@ _gsp_pr() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    create|list|view|edit|diff|comment|comments|review|status|merge)
+    create|list|view|edit|diff|comment|edit-comment|comments|review|status|merge)
         # Offer subcommand argument completions
         "_gsp_pr_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'create list view edit diff comment comments review status merge' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'create list view edit diff comment edit-comment comments review status merge' -- "${cur}"))
         ;;
     esac
 }
@@ -2454,6 +2370,43 @@ _gsp_pr_comment() {
     esac
 }
 
+_gsp_pr_edit-comment() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --comment -b --body -F --body-file --idempotency-key)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--comment')
+        return
+        ;;
+    '-b'|'--body')
+        return
+        ;;
+    '-F'|'--body-file')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    esac
+}
+
 _gsp_pr_comments() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
@@ -2598,31 +2551,6 @@ _gsp_completion() {
     case "${positional_number}" in
     1)
         __gsp_add_completions -W 'bash'$'\n''zsh'$'\n''fish'
-        return
-        ;;
-    esac
-}
-
-_gsp_body-inspect() {
-    repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
-    repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --body-file)
-    __gsp_offer_flags_options 0
-
-    # Offer option value completions
-    case "${prev}" in
-    '--profile')
-        return
-        ;;
-    '--timeout-seconds')
-        return
-        ;;
-    '--session-store')
-        __gsp_add_completions -W 'keychain'$'\n''file'
-        return
-        ;;
-    '--body-file')
         return
         ;;
     esac
