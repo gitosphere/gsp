@@ -6,6 +6,12 @@ server may reject an operation the client offers.
 
 Common options apply to authenticated commands: `--profile`, `--json`,
 `--verbose`, `--non-interactive`, `--timeout-seconds`, and `--session-store`.
+`--verbose` also writes one `gsp timing:` line to standard error for each
+stage of a command: the session lock, Keychain or session file reads and
+writes, session refreshes, and each HTTP or XRPC request with its NSID, host,
+and status. Each line gives the offset from the start of the process and the
+duration in milliseconds. The lines never include tokens, bodies, or query
+strings, and standard output is unchanged.
 Lists take `--skip` and `--max-count` (default 50) and may take `--no-pager`.
 Writes that take `--idempotency-key` and `--dry-run` follow the rules in
 [workflows.md](workflows.md). Issue and PR commands select the repository with
