@@ -114,10 +114,13 @@ Treat invitation codes as secrets.
 | --- | --- | --- |
 | `issue create --title TITLE` | Create an Issue (`--body`, `--body-file`, `--editor`, `--parent`). | writer |
 | `issue list` | List Issues. `--state open|closed|all` and relation filters `--parent`, `--related`, `--blocking`, `--blocked-by`, `--has-children`, `--blocked`. | reader |
-| `issue view ISSUE` | Show an Issue with its relations. | reader |
+| `issue view ISSUE` | Show an Issue with its relations and, except with `--json`, its comments. | reader |
 | `issue edit ISSUE` | Edit the title or body, or change exactly one relation (`--parent`, `--remove-parent`, `--add-sub-issue`, `--remove-sub-issue`, `--add-related`, `--remove-related`, `--add-blocking`, `--remove-blocking`, `--add-blocked-by`, `--remove-blocked-by`). Repeating a relation option is rejected. | writer |
 | `issue close ISSUE` | Close an Issue. | writer |
 | `issue reopen ISSUE` | Reopen an Issue. | writer |
+| `issue comment ISSUE` | Add a comment (`--body`, `--body-file`; opens an editor when neither is given). `--dry-run` signs the comment without writing it. | writer |
+| `issue comments ISSUE` | List an Issue's comments, oldest first. Edited comments carry `updatedAt`. | reader |
+| `issue edit-comment ISSUE --comment URI` | Replace the body of a comment you wrote (`--body`, `--body-file`). The comment keeps its record key and creation time. | The comment's author, with writer |
 | `issue adopt-baseline` | Review existing Issue records with `--dry-run`, then adopt them with the returned `--source-digest`. An administrative migration, not routine repair. | admin |
 | `issue resume-mutation OPERATION_ID` | Resume publishing and committing a prepared Issue mutation after an interruption. | The original writer |
 

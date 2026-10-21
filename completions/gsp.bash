@@ -1823,13 +1823,13 @@ _gsp_issue() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    create|list|view|edit|close|reopen|adopt-baseline|resume-mutation)
+    create|list|view|edit|close|reopen|comment|comments|edit-comment|adopt-baseline|resume-mutation)
         # Offer subcommand argument completions
         "_gsp_issue_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'create list view edit close reopen adopt-baseline resume-mutation' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'create list view edit close reopen comment comments edit-comment adopt-baseline resume-mutation' -- "${cur}"))
         ;;
     esac
 }
@@ -2058,6 +2058,108 @@ _gsp_issue_reopen() {
         return
         ;;
     '-R'|'--repo')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    esac
+}
+
+_gsp_issue_comment() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo -b --body -F --body-file --idempotency-key)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '-b'|'--body')
+        return
+        ;;
+    '-F'|'--body-file')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    esac
+}
+
+_gsp_issue_comments() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --skip --max-count)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--skip')
+        return
+        ;;
+    '--max-count')
+        return
+        ;;
+    esac
+}
+
+_gsp_issue_edit-comment() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --comment -b --body -F --body-file --idempotency-key)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--comment')
+        return
+        ;;
+    '-b'|'--body')
+        return
+        ;;
+    '-F'|'--body-file')
         return
         ;;
     '--idempotency-key')

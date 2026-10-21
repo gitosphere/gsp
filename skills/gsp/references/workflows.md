@@ -116,6 +116,18 @@ Creation may generate a key when omitted, but automation that may retry should
 supply one. Non-interactive edits require a key. Reuse a key only for identical
 logical requests; an idempotency conflict is not permission to try a fresh key.
 
+Issue comments are writes too. Add one with `issue comment NUMBER --body-file
+comment.md`, and take a comment's `uri` from `issue comments NUMBER --json`
+before editing it. Only the comment's author can edit it, and an edit replaces
+the body only. Read the comment back after creating or editing it.
+
+```sh
+gsp --profile PROFILE issue comment NUMBER --repo OWNER/REPO --body-file comment.md \
+  --idempotency-key REQUEST_KEY --json --non-interactive
+gsp --profile PROFILE issue edit-comment NUMBER --repo OWNER/REPO --comment COMMENT_URI \
+  --body-file comment.md --idempotency-key REQUEST_KEY --dry-run --json --non-interactive
+```
+
 On revision conflicts, fetch the current state and reconcile concurrent changes
 with the user's intent before a new write. On interrupted mutations, inspect
 the returned operation ID and supported `issue resume-mutation` workflow; retain

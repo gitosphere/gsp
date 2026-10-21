@@ -1471,6 +1471,9 @@ _gsp_issue() {
             'edit:'
             'close:'
             'reopen:'
+            'comment:Add a comment to an issue'
+            'comments:List the comments on an issue'
+            'edit-comment:Replace the body of an issue comment you wrote'
             'adopt-baseline:Review and adopt existing Issue records before enabling authorized mutations'
             'resume-mutation:Resume publishing and committing a prepared Issue mutation'
         )
@@ -1478,7 +1481,7 @@ _gsp_issue() {
         ;;
     arg)
         case "${words[1]}" in
-        create|list|view|edit|close|reopen|adopt-baseline|resume-mutation)
+        create|list|view|edit|close|reopen|comment|comments|edit-comment|adopt-baseline|resume-mutation)
             "_gsp_issue_${words[1]}" && ret=0
             ;;
         esac
@@ -1635,6 +1638,77 @@ _gsp_issue_reopen() {
         '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
         ':issue:'
         '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
+        '--dry-run[Describe the operation without applying it]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_issue_comment() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':issue:'
+        '(-b --body)'{-b,--body}'[Comment body]:body:'
+        '(-F --body-file)'{-F,--body-file}'[Read the comment body from a file; use - for stdin]:body-file:'
+        '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
+        '--dry-run[Validate and sign the comment without writing it]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_issue_comments() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':issue:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_issue_edit-comment() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':issue:'
+        '--comment[AT URI of the comment to edit]:comment:'
+        '(-b --body)'{-b,--body}'[Set the comment body]:body:'
+        '(-F --body-file)'{-F,--body-file}'[Read the comment body from a file; use - for stdin]:body-file:'
+        '--idempotency-key[Idempotency key; required with --non-interactive]:idempotency-key:'
         '--dry-run[Describe the operation without applying it]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
