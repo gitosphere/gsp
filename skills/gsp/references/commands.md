@@ -137,8 +137,8 @@ even when the text is unchanged; an unchanged `--editor` session sends nothing.
 | `pr view NUMBER` | Show a PR with its rounds. | reader |
 | `pr edit NUMBER` | Edit the title or body (`--title`, `--body`, `--body-file`, `--editor`). | writer |
 | `pr diff NUMBER` | Show the unified diff for a round (`--round`, `--color`, `--no-pager`). | reader |
-| `pr comment NUMBER` | Add a comment or finding (`--body`, `--body-file`, `--round`, `--path`, `--side base|head`, `--start-line`, `--line`, `--severity`, `--category`, `--blocking`). Opens an editor when no body option is given. | writer |
-| `pr comments NUMBER` | List comments (`--round`). Each comment's `uri` identifies it for editing. | reader |
+| `pr comment NUMBER` | Add a comment or finding (`--body`, `--body-file`, `--round`, `--path`, `--side base|head`, `--start-line`, `--line`, `--severity info|low|medium|high|critical`, `--category`, `--blocking`). Opens an editor when no body option is given. | writer |
+| `pr comments NUMBER` | List comments (`--round`). Each comment's `uri` identifies it for editing. Authors show as `handle (DID)` from the handle verified when the comment was signed; the DID is authoritative. | reader |
 | `pr edit-comment NUMBER --comment URI` | Replace the body of a comment you wrote (`--body`, `--body-file`). Its round, position, severity, blocking flag, and creation time are kept. | The comment's author, with writer |
 | `pr review NUMBER` | Record one of `--comment`, `--approve`, or `--request-changes` (`--body`, `--body-file`, `--evidence-file`, `--unverified`). | writer; approval excludes the PR author |
 | `pr status NUMBER` | Show approvals, blocking findings, and whether the PR is mergeable. | reader |

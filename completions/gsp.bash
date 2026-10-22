@@ -2452,6 +2452,7 @@ _gsp_pr_comment() {
         return
         ;;
     '--side')
+        __gsp_add_completions -W 'base'$'\n''head'
         return
         ;;
     '--start-line')
@@ -2461,6 +2462,7 @@ _gsp_pr_comment() {
         return
         ;;
     '--severity')
+        __gsp_add_completions -W 'info'$'\n''low'$'\n''medium'$'\n''high'$'\n''critical'
         return
         ;;
     '--category')

@@ -1921,6 +1921,8 @@ _gsp_pr_diff() {
 _gsp_pr_comment() {
     local -i ret=1
     local -ar ___session_store=('keychain' 'file')
+    local -ar ___side=('base' 'head')
+    local -ar ___severity=('info' 'low' 'medium' 'high' 'critical')
     local -ar arg_specs=(
         '--json[Emit stable machine-readable JSON]'
         '--verbose[Emit diagnostic details]'
@@ -1934,10 +1936,10 @@ _gsp_pr_comment() {
         '(-F --body-file)'{-F,--body-file}'[Read body from a file; use - for stdin]:body-file:'
         '--round:round:'
         '--path:path:'
-        '--side[Diff side\: base or head]:side:'
+        '--side[Diff side]:side:{__gsp_complete "${___side[@]}"}'
         '--start-line:start-line:'
         '--line:line:'
-        '--severity:severity:'
+        '--severity:severity:{__gsp_complete "${___severity[@]}"}'
         '--category:category:'
         '--blocking'
         '--idempotency-key:idempotency-key:'
