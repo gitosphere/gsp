@@ -69,6 +69,7 @@ _gsp() {
             'audit:Inspect secret-safe Gitosphere audit events'
             'issue:Manage issues in a Gitosphere repository'
             'pr:Manage pull requests in a Gitosphere repository'
+            'events:Read the event feed of a repository'
             'completion:Generate a shell completion script'
             'help:Show subcommand help information.'
         )
@@ -76,7 +77,7 @@ _gsp() {
         ;;
     arg)
         case "${words[1]}" in
-        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|completion|help)
+        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|completion|help)
             "_gsp_${words[1]}" && ret=0
             ;;
         esac
@@ -2063,6 +2064,79 @@ _gsp_pr_merge() {
         '--match-head-commit[Full current head commit SHA reviewed for this merge]:match-head-commit:'
         '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
         '--dry-run[Validate the merge without updating refs or Pull Request state]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_events() {
+    local -i ret=1
+    local -ar arg_specs=(
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+    case "${state}" in
+    command)
+        local -ar subcommands=(
+            'list:Print the events after a cursor, starting at the oldest retained event'
+            'watch:Keep printing new events, one JSON object per line'
+        )
+        _describe -V subcommand subcommands && ret=0
+        ;;
+    arg)
+        case "${words[1]}" in
+        list|watch)
+            "_gsp_events_${words[1]}" && ret=0
+            ;;
+        esac
+        ;;
+    esac
+
+    return "${ret}"
+}
+
+_gsp_events_list() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        '--after[Continue after this event cursor]:after:'
+        '*--kind[Only print this event type; repeat for more. Filtering does not change cursors]:kind:'
+        '--max-count[Maximum number of events to print (1-1000)]:max-count:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_events_watch() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        '--after[Continue after this event cursor]:after:'
+        '*--kind[Only print this event type; repeat for more. Filtering does not change cursors]:kind:'
+        '--interval[Seconds to wait between polls when no new event is available (1-3600)]:interval:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

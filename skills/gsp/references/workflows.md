@@ -216,6 +216,7 @@ diagnostic rather than inventing JSON fields.
 | 3 | API failure | Inspect the error code, compatibility, conflicts, and partial results. |
 | 4 | Authentication/session failure | Diagnose the selected profile/store; use same-profile login only when needed. |
 | 5 | Access denied | Inspect a returned decision or error; do not escalate privileges automatically. |
+| 6 | Event cursor expired | Drop the saved cursor, read the current state again, then follow new events. |
 | 64 | Invalid usage/configuration | Recheck installed help and explicit target configuration. |
 | 75 | Temporary failure | Respect retry metadata; retry safe reads within a bounded budget, reconcile writes first. |
 

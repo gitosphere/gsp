@@ -144,6 +144,28 @@ even when the text is unchanged; an unchanged `--editor` session sends nothing.
 | `pr status NUMBER` | Show approvals, blocking findings, and whether the PR is mergeable. | reader |
 | `pr merge NUMBER --match-head-commit SHA` | Merge the reviewed head. Use `--dry-run` first. | writer; protected default branch needs admin |
 
+## Events
+
+Events carry identifiers only (`type`, `pullRequest`, `round`, `roundReason`,
+`issue`, `state`, `actor`); read the PR or Issue again for its content. Each event
+has a `cursor` string. Save the cursor of the last event you processed and pass it
+to `--after` to continue. Exit status 6 (`CursorExpired`) means the events after the
+cursor are no longer kept (30 days): drop the cursor and read the current state again.
+A cursor from another repository exits 64 (`CursorMismatch`). `--kind` filters
+without holding the cursor back. Event types are listed in the server's
+`docs/repository-events.md`.
+
+| Command | Purpose | Who |
+| --- | --- | --- |
+| `events list` | Print events after `--after`, from the oldest kept event without it (`--kind`, `--max-count` up to 1000). JSON has `events` and `nextCursor`. `gsp events` alone runs this. | reader |
+| `events watch` | Keep polling (`--interval`, default 10 seconds) and print each new event as one JSON line. Without `--after` it starts from now. Temporary failures are retried; other failures exit with their status. | reader |
+
+An event consumer that restarts the command can resume like this:
+
+```sh
+gsp events watch --repo OWNER/NAME ${CURSOR:+--after "$CURSOR"}
+```
+
 ## Shell completion
 
 | Command | Purpose | Who |
