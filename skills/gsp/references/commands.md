@@ -31,6 +31,7 @@ column as guidance, not as a permission check.
 | `auth status` | Show non-secret session status: account, server, realm, store, expiry, `refreshable`. Does not refresh. | Any user |
 | `auth logout` | Delete the selected profile's session. | Any user |
 | `auth use PROFILE` | Select the default profile without changing its credentials. | Any user |
+| `auth id-token --audience AUD --repo OWNER/NAME` | Issue a short-lived OIDC ID token for the signed-in account acting for one repository, for a relying party such as Claude API Workload Identity Federation. `--repo` is required and needs read access. `--lifetime SECONDS` (60-3600, default 300) sets how long it stays valid; `--output FILE` writes the token with mode 0600 instead of standard output. A token can be exchanged once, so issue one per exchange. A server without an ID token key fails with `IdTokenIssuerNotConfigured` (exit 3). | reader |
 
 ## Organizations and members
 

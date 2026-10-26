@@ -103,12 +103,13 @@ _gsp_auth() {
             'status:Show non-secret authentication status'
             'logout:Delete the selected profile'\''s session'
             'use:Select the default profile without changing its credentials'
+            'id-token:Issue a short-lived OIDC ID token for the signed-in account and a repository'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        login|status|logout|use)
+        login|status|logout|use|id-token)
             "_gsp_auth_${words[1]}" && ret=0
             ;;
         esac
@@ -188,6 +189,28 @@ _gsp_auth_use() {
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
         ':profile:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_auth_id-token() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--audience[The aud claim the relying party expects]:audience:'
+        '(-R --repo)'{-R,--repo}'[The repository (OWNER/NAME) the token is for; requires read access]:repo:'
+        '--lifetime[Seconds the token stays valid (60-3600, default 300)]:lifetime:'
+        '--output[Write the token to this file with mode 0600 instead of standard output]:output:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
