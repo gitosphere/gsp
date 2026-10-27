@@ -559,6 +559,7 @@ _gsp_repo_search() {
         '--skip[Number of resources to skip before returning results (>=0)]:skip:'
         '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
         ':query:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1709,6 +1710,7 @@ _gsp_issue_comments() {
         ':issue:'
         '--skip[Number of resources to skip before returning results (>=0)]:skip:'
         '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1959,10 +1961,11 @@ _gsp_pr_comment() {
         '(-b --body)'{-b,--body}':body:'
         '(-F --body-file)'{-F,--body-file}'[Read body from a file; use - for stdin]:body-file:'
         '--round:round:'
-        '--path:path:'
-        '--side[Diff side]:side:{__gsp_complete "${___side[@]}"}'
-        '--start-line:start-line:'
-        '--line:line:'
+        '--at[Diff location\: \[base\:|head\:\]PATH\[\:LINE\[-END\]\]. The lines must be inside one hunk of the round'\''s diff; without a line, comments on the file.]:location:'
+        '--path[Diff file path; prefer --at]:path:'
+        '--side[Diff side; prefer --at]:side:{__gsp_complete "${___side[@]}"}'
+        '--start-line[First line of a range; prefer --at]:start-line:'
+        '--line[Line; prefer --at]:line:'
         '--severity:severity:{__gsp_complete "${___severity[@]}"}'
         '--category:category:'
         '--blocking'
@@ -2015,6 +2018,7 @@ _gsp_pr_comments() {
         '--round:round:'
         '--skip[Number of resources to skip before returning results (>=0)]:skip:'
         '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -2138,6 +2142,7 @@ _gsp_events_list() {
         '--after[Continue after this event cursor]:after:'
         '*--kind[Only print this event type; repeat for more. Filtering does not change cursors]:kind:'
         '--max-count[Maximum number of events to print (1-1000)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

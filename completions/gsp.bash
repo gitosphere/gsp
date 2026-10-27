@@ -748,7 +748,7 @@ _gsp_repo_list() {
 
 _gsp_repo_search() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
     non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
     __gsp_offer_flags_options 1
@@ -2136,7 +2136,7 @@ _gsp_issue_comment() {
 
 _gsp_issue_comments() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
     non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --skip --max-count)
     __gsp_offer_flags_options 1
@@ -2455,7 +2455,7 @@ _gsp_pr_comment() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --blocking --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo -b --body -F --body-file --round --path --side --start-line --line --severity --category --idempotency-key)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo -b --body -F --body-file --round --at --path --side --start-line --line --severity --category --idempotency-key)
     __gsp_offer_flags_options 1
 
     # Offer option value completions
@@ -2480,6 +2480,9 @@ _gsp_pr_comment() {
         return
         ;;
     '--round')
+        return
+        ;;
+    '--at')
         return
         ;;
     '--path')
@@ -2547,7 +2550,7 @@ _gsp_pr_edit-comment() {
 
 _gsp_pr_comments() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
     non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --round --skip --max-count)
     __gsp_offer_flags_options 1
@@ -2703,7 +2706,7 @@ _gsp_events() {
 
 _gsp_events_list() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=(--kind)
     non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --after --max-count)
     __gsp_offer_flags_options 0

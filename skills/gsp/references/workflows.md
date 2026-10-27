@@ -165,8 +165,11 @@ gsp --profile PROFILE pr edit-comment NUMBER --repo OWNER/REPO --comment COMMENT
   --body-file comment.md --idempotency-key REQUEST_KEY --dry-run --json --non-interactive
 ```
 
-`pr comment` takes `--path`, `--side`, `--line`, and `--start-line` for a finding on
-the diff, and `--blocking` for one that must be resolved before merging. Only a
+`pr comment` takes `--at PATH:LINE` (or `PATH:START-END`, `base:PATH:LINE` for a
+removed line, `PATH` for the whole file) for a finding on the diff, and `--blocking`
+for one that must be resolved before merging. The lines must be inside one hunk of
+`pr diff --round ROUND`; for code outside the diff, comment on the pull request
+without `--at`. On `InvalidDiffLocation`, pick lines from the ranges in the message. Only a
 comment's author can edit it with `pr edit-comment`; take its `uri` from
 `pr comments --json`. Editing replaces the body only and keeps the round and
 position. Read the comment back after creating or editing it. Keep verification evidence
