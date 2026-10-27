@@ -1969,6 +1969,7 @@ _gsp_pr_comment() {
         '--severity:severity:{__gsp_complete "${___severity[@]}"}'
         '--category:category:'
         '--blocking'
+        '--reply-to[AT URI of a top-level comment to reply to. A reply takes that comment'\''s round and location.]:comment:'
         '--idempotency-key:idempotency-key:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'

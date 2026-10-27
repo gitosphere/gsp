@@ -172,7 +172,11 @@ for one that must be resolved before merging. The lines must be inside one hunk 
 without `--at`. On `InvalidDiffLocation`, pick lines from the ranges in the message. Only a
 comment's author can edit it with `pr edit-comment`; take its `uri` from
 `pr comments --json`. Editing replaces the body only and keeps the round and
-position. Read the comment back after creating or editing it. Keep verification evidence
+position. Reply to a comment with `pr comment NUMBER --reply-to COMMENT_URI`; replies
+are one level deep and inherit the comment's round and location. In
+`pr comments --json`, group replies by `replyTo`, and use `context` for the
+commented lines and `locationChanged` to see whether an earlier-round location
+still matches the current round. Read the comment back after creating or editing it. Keep verification evidence
 separate from unverified scope and never infer approval from a request to read.
 
 The current server fixes `requiredApprovals` at zero. A PR without qualifying

@@ -2455,7 +2455,7 @@ _gsp_pr_comment() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --blocking --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo -b --body -F --body-file --round --at --path --side --start-line --line --severity --category --idempotency-key)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo -b --body -F --body-file --round --at --path --side --start-line --line --severity --category --reply-to --idempotency-key)
     __gsp_offer_flags_options 1
 
     # Offer option value completions
@@ -2503,6 +2503,9 @@ _gsp_pr_comment() {
         return
         ;;
     '--category')
+        return
+        ;;
+    '--reply-to')
         return
         ;;
     '--idempotency-key')
