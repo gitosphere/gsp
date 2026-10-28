@@ -1807,6 +1807,7 @@ _gsp_pr() {
             'edit-comment:Replace the body of a comment you wrote'
             'comments:'
             'review:'
+            'reviews:List the reviews of a pull request with their bodies'
             'status:'
             'merge:'
         )
@@ -1814,7 +1815,7 @@ _gsp_pr() {
         ;;
     arg)
         case "${words[1]}" in
-        create|list|view|edit|diff|comment|edit-comment|comments|review|status|merge)
+        create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|status|merge)
             "_gsp_pr_${words[1]}" && ret=0
             ;;
         esac
@@ -2049,6 +2050,30 @@ _gsp_pr_review() {
         '--evidence-file[JSON file containing verification and unverified arrays]:evidence-file:'
         '--unverified[Scope not verified; repeatable]:unverified:'
         '--idempotency-key:idempotency-key:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_pr_reviews() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':number:'
+        '--round:round:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

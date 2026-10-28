@@ -135,14 +135,15 @@ even when the text is unchanged; an unchanged `--editor` session sends nothing.
 | --- | --- | --- |
 | `pr create --title TITLE` | Create a PR from `--head` into `--base` (`--body`, `--body-file`). | writer |
 | `pr list` | List PRs (`--state open|closed|merged|all`, `--author DID`). | reader |
-| `pr view NUMBER` | Show a PR with its rounds. | reader |
+| `pr view NUMBER` | Show a PR with its rounds; the human output ends with the current round's reviews. JSON stays the PR alone. | reader |
 | `pr edit NUMBER` | Edit the title or body (`--title`, `--body`, `--body-file`, `--editor`). | writer |
 | `pr diff NUMBER` | Show the unified diff for a round (`--round`, `--color`, `--no-pager`). | reader |
 | `pr comment NUMBER` | Add a comment or finding (`--body`, `--body-file`, `--round`, `--at [base:|head:]PATH[:LINE[-END]]`, `--severity info|low|medium|high|critical`, `--category`, `--blocking`). `--at` lines must be inside one hunk of the round's diff on that side; `--at PATH` comments on a changed file. A location outside the diff fails with `InvalidDiffLocation` (exit 3), whose message lists the lines the diff shows. `--path`, `--side`, `--start-line`, and `--line` remain for compatibility. `--reply-to COMMENT_URI` replies to a top-level comment of the same PR; a reply takes that comment's round and location, so it rejects `--round`, `--at`, the location options, `--severity`, `--category`, and `--blocking`, and the server rejects other targets with `InvalidReplyTo`. Opens an editor when no body option is given. | writer |
 | `pr comments NUMBER` | List comments (`--round`) as threads: current-round threads first, then `Earlier rounds`; line comments show an excerpt of the commented lines from the recorded commit, and earlier-round comments show `outdated` or `unchanged`. JSON stays a flat `comments[]` with `replyTo`, `context` (excerpt lines), and `locationChanged`. Each comment's `uri` identifies it for editing and replies. Authors show as `handle (DID)` from the handle verified when the comment was signed; the DID is authoritative. | reader |
 | `pr edit-comment NUMBER --comment URI` | Replace the body of a comment you wrote (`--body`, `--body-file`). Its round, position, severity, blocking flag, and creation time are kept. | The comment's author, with writer |
 | `pr review NUMBER` | Record one of `--comment`, `--approve`, or `--request-changes` (`--body`, `--body-file`, `--evidence-file`, `--unverified`). | writer; approval excludes the PR author |
-| `pr status NUMBER` | Show approvals, blocking findings, and whether the PR is mergeable. | reader |
+| `pr reviews NUMBER` | List reviews (`--round`) with their decision, reviewer as `handle (DID)`, round, and plain-text body: current round first, then `Earlier rounds`. `counts` marks the reviews the current decision is made from (`qualifying`); JSON is `reviews[]`. | reader |
+| `pr status NUMBER` | Show approvals with the approvers as `handle (DID)`, blocking findings, and whether the PR is mergeable. JSON adds `approvers` (`did`, `handle`, `reviewUri`) next to `status`. | reader |
 | `pr merge NUMBER --match-head-commit SHA` | Merge the reviewed head. Use `--dry-run` first. | writer; protected default branch needs admin |
 
 ## Events

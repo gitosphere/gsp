@@ -179,6 +179,10 @@ commented lines and `locationChanged` to see whether an earlier-round location
 still matches the current round. Read the comment back after creating or editing it. Keep verification evidence
 separate from unverified scope and never infer approval from a request to read.
 
+Read review bodies and decisions with `pr reviews NUMBER --json`; the reviewer DID is
+`reviewer`, and `qualifying` marks the reviews the current decision counts. `pr status --json`
+lists the counted approvers in `approvers`.
+
 The current server fixes `requiredApprovals` at zero. A PR without qualifying
 approvals reports `not_required`, not `approved`; inspect `mergeable` and
 `blockingReasons` as well. Change requests, blocking findings, failed verification,

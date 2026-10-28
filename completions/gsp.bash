@@ -2267,13 +2267,13 @@ _gsp_pr() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    create|list|view|edit|diff|comment|edit-comment|comments|review|status|merge)
+    create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|status|merge)
         # Offer subcommand argument completions
         "_gsp_pr_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'create list view edit diff comment edit-comment comments review status merge' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'create list view edit diff comment edit-comment comments review reviews status merge' -- "${cur}"))
         ;;
     esac
 }
@@ -2623,6 +2623,40 @@ _gsp_pr_review() {
         return
         ;;
     '--idempotency-key')
+        return
+        ;;
+    esac
+}
+
+_gsp_pr_reviews() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --round --skip --max-count)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--round')
+        return
+        ;;
+    '--skip')
+        return
+        ;;
+    '--max-count')
         return
         ;;
     esac
