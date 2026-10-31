@@ -234,12 +234,13 @@ _gsp_org() {
             'create:'
             'get:'
             'list:'
+            'syncer:Manage the Organization'\''s space syncer account'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        create|get|list)
+        create|get|list|syncer)
             "_gsp_org_${words[1]}" && ret=0
             ;;
         esac
@@ -303,6 +304,103 @@ _gsp_org_list() {
         '--skip[Number of resources to skip before returning results (>=0)]:skip:'
         '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
         '--no-pager[Write the list directly without an external pager]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_org_syncer() {
+    local -i ret=1
+    local -ar arg_specs=(
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+    case "${state}" in
+    command)
+        local -ar subcommands=(
+            'register:Register a dedicated account as the space syncer (owner only)'
+            'remove:Remove the space syncer and revoke its session (owner or admin)'
+            'status:Show the space syncer and its session'\''s expiry'
+        )
+        _describe -V subcommand subcommands && ret=0
+        ;;
+    arg)
+        case "${words[1]}" in
+        register|remove|status)
+            "_gsp_org_syncer_${words[1]}" && ret=0
+            ;;
+        esac
+        ;;
+    esac
+
+    return "${ret}"
+}
+
+_gsp_org_syncer_register() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--organization[Organization public name]:organization:'
+        '--organization-id[Immutable Organization ID]:organization-id:'
+        '--dry-run[Describe the operation without applying it]'
+        '--idempotency-key[Idempotency key for a mutation request]:idempotency-key:'
+        '--did[DID of the dedicated syncer account]:did:'
+        '--no-browser[Print the authorization URL instead of opening a browser]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_org_syncer_remove() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--organization[Organization public name]:organization:'
+        '--organization-id[Immutable Organization ID]:organization-id:'
+        '--dry-run[Describe the operation without applying it]'
+        '--idempotency-key[Idempotency key for a mutation request]:idempotency-key:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_org_syncer_status() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--organization[Organization public name]:organization:'
+        '--organization-id[Immutable Organization ID]:organization-id:'
+        '--request-id[Request ID printed by register, to read that registration'\''s outcome]:request-id:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

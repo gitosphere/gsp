@@ -44,6 +44,9 @@ column as guidance, not as a permission check.
 | `member add --principal DID --role ROLE` | Add a member with role `owner`, `admin`, `writer`, or `reader`. | admin |
 | `member update --principal DID --role ROLE` | Change a member's role. | admin |
 | `member remove --principal DID` | Remove a member. | admin |
+| `org syncer register --did DID` | Register a dedicated account as the Organization's space syncer, so the server can read its Space repositories in the background. Opens the authorization page and waits for the outcome; sign in as the syncer account. `--no-browser` prints the URL and still waits; `--non-interactive` prints the URL and a request ID without waiting (read the outcome with `status --request-id`). Requires `--idempotency-key`; supports `--dry-run`. | owner |
+| `org syncer remove` | Remove the space syncer and try to revoke its session. Requires `--idempotency-key`; supports `--dry-run`. | admin |
+| `org syncer status` | Show the space syncer, its state, and when its session ends. `--request-id` shows the outcome of your registration. | Member |
 
 Membership writes require `--idempotency-key` and support `--dry-run`.
 Gitosphere membership is separate from Space membership.
@@ -114,8 +117,8 @@ Treat invitation codes as secrets.
 | Command | Purpose | Who |
 | --- | --- | --- |
 | `issue create --title TITLE` | Create an Issue (`--body`, `--body-file`, `--editor`, `--parent`). | writer |
-| `issue list` | List Issues. `--state open|closed|all` and relation filters `--parent`, `--related`, `--blocking`, `--blocked-by`, `--has-children`, `--blocked`. | reader |
-| `issue view ISSUE` | Show an Issue with its relations and, except with `--json`, its comments. | reader |
+| `issue list` | List Issues. `--state open|closed|all` and relation filters `--parent`, `--related`, `--blocking`, `--blocked-by`, `--has-children`, `--blocked`. The last column is the author as `handle (DID)`; JSON adds `author` and `authorHandle`. | reader |
+| `issue view ISSUE` | Show an Issue with its author as `handle (DID)`, its relations and, except with `--json`, its comments. JSON adds `author` and `authorHandle`. | reader |
 | `issue edit ISSUE` | Edit the title or body, or change exactly one relation (`--parent`, `--remove-parent`, `--add-sub-issue`, `--remove-sub-issue`, `--add-related`, `--remove-related`, `--add-blocking`, `--remove-blocking`, `--add-blocked-by`, `--remove-blocked-by`). Repeating a relation option is rejected. | writer |
 | `issue close ISSUE` | Close an Issue. | writer |
 | `issue reopen ISSUE` | Reopen an Issue. | writer |

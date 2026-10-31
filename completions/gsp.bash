@@ -364,13 +364,13 @@ _gsp_org() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    create|get|list)
+    create|get|list|syncer)
         # Offer subcommand argument completions
         "_gsp_org_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'create get list' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'create get list syncer' -- "${cur}"))
         ;;
     esac
 }
@@ -454,6 +454,125 @@ _gsp_org_list() {
         return
         ;;
     '--max-count')
+        return
+        ;;
+    esac
+}
+
+_gsp_org_syncer() {
+    repeating_flags=()
+    non_repeating_flags=(--version -h --help)
+    repeating_options=()
+    non_repeating_options=()
+    __gsp_offer_flags_options 0
+
+    # Offer subcommand / subcommand argument completions
+    local -r subcommand="${unparsed_words[0]}"
+    unset 'unparsed_words[0]'
+    unparsed_words=("${unparsed_words[@]}")
+    case "${subcommand}" in
+    register|remove|status)
+        # Offer subcommand argument completions
+        "_gsp_org_syncer_${subcommand}"
+        ;;
+    *)
+        # Offer subcommand completions
+        COMPREPLY+=($(compgen -W 'register remove status' -- "${cur}"))
+        ;;
+    esac
+}
+
+_gsp_org_syncer_register() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --no-browser --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store --organization --organization-id --idempotency-key --did)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '--organization')
+        return
+        ;;
+    '--organization-id')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    '--did')
+        return
+        ;;
+    esac
+}
+
+_gsp_org_syncer_remove() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store --organization --organization-id --idempotency-key)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '--organization')
+        return
+        ;;
+    '--organization-id')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    esac
+}
+
+_gsp_org_syncer_status() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store --organization --organization-id --request-id)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '--organization')
+        return
+        ;;
+    '--organization-id')
+        return
+        ;;
+    '--request-id')
         return
         ;;
     esac
