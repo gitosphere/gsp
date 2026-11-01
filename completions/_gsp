@@ -1906,6 +1906,8 @@ _gsp_pr() {
             'comments:'
             'review:'
             'reviews:List the reviews of a pull request with their bodies'
+            'threads:List the blocking threads and where they stand'
+            'resolve:Give a verdict on a blocking thread'
             'status:'
             'merge:'
         )
@@ -1913,7 +1915,7 @@ _gsp_pr() {
         ;;
     arg)
         case "${words[1]}" in
-        create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|status|merge)
+        create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge)
             "_gsp_pr_${words[1]}" && ret=0
             ;;
         esac
@@ -2172,6 +2174,55 @@ _gsp_pr_reviews() {
         '--skip[Number of resources to skip before returning results (>=0)]:skip:'
         '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
         '--no-pager[Write the list directly without an external pager]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_pr_threads() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar ___state=('unresolved' 'pending-recheck' 'resolved')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':number:'
+        '--state[Only threads in this state]:state:{__gsp_complete "${___state[@]}"}'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_pr_resolve() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar ___verdict=('addressed' 'no-longer-applies' 'still-applies')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':number:'
+        '--thread[AT URI of the blocking comment that starts the thread]:comment:'
+        '--verdict[addressed, no-longer-applies, or still-applies]:verdict:{__gsp_complete "${___verdict[@]}"}'
+        '--reason[Why the verdict holds]:reason:'
+        '--at[With still-applies, where the thread now is\: \[base\:|head\:\]PATH\[\:LINE\[-END\]\] in the current round'\''s diff.]:location:'
+        '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
+        '--dry-run[Describe the operation without applying it]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

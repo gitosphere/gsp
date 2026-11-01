@@ -2386,13 +2386,13 @@ _gsp_pr() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|status|merge)
+    create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge)
         # Offer subcommand argument completions
         "_gsp_pr_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'create list view edit diff comment edit-comment comments review reviews status merge' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'create list view edit diff comment edit-comment comments review reviews threads resolve status merge' -- "${cur}"))
         ;;
     esac
 }
@@ -2776,6 +2776,76 @@ _gsp_pr_reviews() {
         return
         ;;
     '--max-count')
+        return
+        ;;
+    esac
+}
+
+_gsp_pr_threads() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --state)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--state')
+        __gsp_add_completions -W 'unresolved'$'\n''pending-recheck'$'\n''resolved'
+        return
+        ;;
+    esac
+}
+
+_gsp_pr_resolve() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --thread --verdict --reason --at --idempotency-key)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--thread')
+        return
+        ;;
+    '--verdict')
+        __gsp_add_completions -W 'addressed'$'\n''no-longer-applies'$'\n''still-applies'
+        return
+        ;;
+    '--reason')
+        return
+        ;;
+    '--at')
+        return
+        ;;
+    '--idempotency-key')
         return
         ;;
     esac

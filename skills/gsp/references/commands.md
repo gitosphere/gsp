@@ -146,7 +146,9 @@ even when the text is unchanged; an unchanged `--editor` session sends nothing.
 | `pr edit-comment NUMBER --comment URI` | Replace the body of a comment you wrote (`--body`, `--body-file`). Its round, position, severity, blocking flag, and creation time are kept. | The comment's author, with writer |
 | `pr review NUMBER` | Record one of `--comment`, `--approve`, or `--request-changes` (`--body`, `--body-file`, `--evidence-file`, `--unverified`). | writer; approval excludes the PR author |
 | `pr reviews NUMBER` | List reviews (`--round`) with their decision, reviewer as `handle (DID)`, round, and plain-text body: current round first, then `Earlier rounds`. `counts` marks the reviews the current decision is made from (`qualifying`); JSON is `reviews[]`. | reader |
-| `pr status NUMBER` | Show approvals with the approvers as `handle (DID)`, blocking findings, and whether the PR is mergeable. JSON adds `approvers` (`did`, `handle`, `reviewUri`) next to `status`. | reader |
+| `pr status NUMBER` | Show approvals with the approvers as `handle (DID)`, blocking findings (and how many wait for a re-check), and whether the PR is mergeable. JSON adds `approvers` (`did`, `handle`, `reviewUri`) next to `status`. | reader |
+| `pr threads NUMBER` | List blocking threads by state: `unresolved` in the round raised or last confirmed, `pending-recheck` once a later round exists, `resolved`. Shows the earlier excerpt and any proposal. `--state` filters; JSON is `threads[]` of comment views with `threadState` and `proposedVerdict`. | reader |
+| `pr resolve NUMBER --thread URI --verdict VERDICT --reason TEXT` | Give a verdict on a blocking thread: `addressed`, `no-longer-applies`, or `still-applies` (with `--at` for its location in the current round). The thread's author and repository admins decide; the PR author can only propose `addressed` or `no-longer-applies`. Supports `--idempotency-key` and `--dry-run`. | writer |
 | `pr merge NUMBER --match-head-commit SHA` | Merge the reviewed head. Use `--dry-run` first. | writer; protected default branch needs admin |
 
 ## Events
