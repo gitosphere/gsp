@@ -209,6 +209,22 @@ before retrying. Resume supported incomplete work with the same profile,
 repository, PR, expected SHA, and key; do not create another merge or reinterpret
 the entire operation as failed. Verify final PR and Issue states separately.
 
+To close a PR without merging it (for example, a throwaway acceptance PR):
+
+```sh
+gsp --profile PROFILE pr close NUMBER --repo OWNER/REPO \
+  --comment-file reason.md --idempotency-key REQUEST_KEY --non-interactive --json
+```
+
+A dry-run close runs first, so a PR that cannot be closed gets no comment.
+The comment is posted before the close. If the close fails after the comment,
+stdout keeps the comment, stderr reports `PullRequestClosePending`, and the
+process exits `3`; retry with the same key to close without a second comment.
+`PullRequestCloseRefused` instead means someone else closed or merged the PR
+after the comment; do not retry, check it with `gsp pr view`.
+Delete the head branch only after the PR is closed, because an open PR without
+its head cannot show its diff.
+
 ## Failure handling
 
 Use process status as the first discriminator, then parse any JSON error on

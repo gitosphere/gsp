@@ -1910,12 +1910,13 @@ _gsp_pr() {
             'resolve:Give a verdict on a blocking thread'
             'status:'
             'merge:'
+            'close:'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge)
+        create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge|close)
             "_gsp_pr_${words[1]}" && ret=0
             ;;
         esac
@@ -2220,7 +2221,7 @@ _gsp_pr_resolve() {
         '--thread[AT URI of the blocking comment that starts the thread]:comment:'
         '--verdict[addressed, no-longer-applies, or still-applies]:verdict:{__gsp_complete "${___verdict[@]}"}'
         '--reason[Why the verdict holds]:reason:'
-        '--at[With still-applies, where the thread now is\: \[base\:|head\:\]PATH\[\:LINE\[-END\]\] in the current round'\''s diff.]:location:'
+        '--at[With still-applies, where the thread now is\: \[base\:|head\:\]PATH\[\:LINE\[-END\]\] in the current round'\''s diff. When omitted, the place the server estimates is used if it is inside that diff.]:location:'
         '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
         '--dry-run[Describe the operation without applying it]'
         '--version[Show the version.]'
@@ -2266,6 +2267,29 @@ _gsp_pr_merge() {
         '--match-head-commit[Full current head commit SHA reviewed for this merge]:match-head-commit:'
         '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
         '--dry-run[Validate the merge without updating refs or Pull Request state]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_pr_close() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':number:'
+        '--comment-file[Post a comment from a file before closing; use - for stdin]:comment-file:'
+        '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
+        '--dry-run[Describe the operation without posting the comment or closing]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
