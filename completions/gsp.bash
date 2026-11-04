@@ -1018,9 +1018,9 @@ _gsp_repo_tree() {
 
 _gsp_repo_blob() {
     repeating_flags=()
-    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store --ref)
+    non_repeating_options=(--profile --timeout-seconds --session-store --ref --color)
     __gsp_offer_flags_options 2
 
     # Offer option value completions
@@ -1036,6 +1036,9 @@ _gsp_repo_blob() {
         return
         ;;
     '--ref')
+        return
+        ;;
+    '--color')
         return
         ;;
     esac
@@ -2031,7 +2034,7 @@ _gsp_issue_list() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --has-children --blocked --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --skip --max-count --state --parent --related --blocking --blocked-by)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --skip --max-count --state --parent --related --blocking --blocked-by --search --sort --order)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -2069,6 +2072,17 @@ _gsp_issue_list() {
         return
         ;;
     '--blocked-by')
+        return
+        ;;
+    '--search')
+        return
+        ;;
+    '--sort')
+        __gsp_add_completions -W 'number'$'\n''created'$'\n''updated'
+        return
+        ;;
+    '--order')
+        __gsp_add_completions -W 'asc'$'\n''desc'
         return
         ;;
     esac
@@ -2386,13 +2400,13 @@ _gsp_pr() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge|close)
+    create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge|close|reopen)
         # Offer subcommand argument completions
         "_gsp_pr_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'create list view edit diff comment edit-comment comments review reviews threads resolve status merge close' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'create list view edit diff comment edit-comment comments review reviews threads resolve status merge close reopen' -- "${cur}"))
         ;;
     esac
 }
@@ -2444,7 +2458,7 @@ _gsp_pr_list() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --no-pager --version -h --help)
     repeating_options=()
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --state --author --skip --max-count)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --state --author --search --sort --order --skip --max-count)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -2466,6 +2480,17 @@ _gsp_pr_list() {
         return
         ;;
     '--author')
+        return
+        ;;
+    '--search')
+        return
+        ;;
+    '--sort')
+        __gsp_add_completions -W 'number'$'\n''created'$'\n''updated'
+        return
+        ;;
+    '--order')
+        __gsp_add_completions -W 'asc'$'\n''desc'
         return
         ;;
     '--skip')
@@ -2908,6 +2933,37 @@ _gsp_pr_merge() {
 }
 
 _gsp_pr_close() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --comment-file --idempotency-key)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--comment-file')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    esac
+}
+
+_gsp_pr_reopen() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
     repeating_options=()

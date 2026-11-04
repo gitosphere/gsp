@@ -100,6 +100,10 @@ not claim a consistent snapshot across concurrent changes. Specify
 
 Inspect the target with `issue view NUMBER --repo OWNER/REPO --json` first for
 an edit or state transition. Use `--repo` to avoid ambiguous clone context.
+Before filing a new Issue, look for an existing one by its words, not only its
+title: `issue list --search WORDS --state all` matches titles, bodies, and
+comments, and `pr list --search WORDS --state all` does the same for PRs.
+Add `--sort updated --order desc` to see the most recently changed first.
 
 ```sh
 gsp --profile PROFILE issue create --repo OWNER/REPO --title TITLE \
@@ -223,7 +227,9 @@ process exits `3`; retry with the same key to close without a second comment.
 `PullRequestCloseRefused` instead means someone else closed or merged the PR
 after the comment; do not retry, check it with `gsp pr view`.
 Delete the head branch only after the PR is closed, because an open PR without
-its head cannot show its diff.
+its head cannot show its diff. `gsp pr reopen NUMBER` opens a closed PR again
+with the same options; push the head branch back if the output warns that it is
+missing.
 
 ## Failure handling
 

@@ -63,7 +63,7 @@ Gitosphere membership is separate from Space membership.
 | `repo clone REPOSITORY [DIRECTORY]` | Clone with ephemeral Git grants and set up the credential helper. | reader |
 | `repo remote set REPOSITORY` | Configure a repository-local remote and credential helper (`--remote`, `--force`). | reader |
 | `repo tree [REPOSITORY]` | List files at `--ref` and `--path`. | reader |
-| `repo blob PATH [REPOSITORY]` | Show a file at `--ref`. | reader |
+| `repo blob PATH [REPOSITORY]` | Show a file at `--ref`. On a terminal, the content goes to `GSP_VIEWER`, then `bat --file-name PATH`, then the pager (`GSP_PAGER`, `PAGER`, `less`); an empty `GSP_VIEWER` or `--no-pager` writes it directly. Pipes, redirects, `--json`, and `--non-interactive` always get the bytes unchanged. `--color auto|always|never`. | reader |
 | `repo diff BASE HEAD` | Show the unified diff between two exact commits (`--repository`, `--color`, `--no-pager`). | reader |
 | `repo repair-space-policy` | Point a private repository's Space at the current Gitosphere managing app. Use `--dry-run` first. | admin |
 
@@ -117,7 +117,7 @@ Treat invitation codes as secrets.
 | Command | Purpose | Who |
 | --- | --- | --- |
 | `issue create --title TITLE` | Create an Issue (`--body`, `--body-file`, `--editor`, `--parent`). | writer |
-| `issue list` | List Issues. `--state open|closed|all` and relation filters `--parent`, `--related`, `--blocking`, `--blocked-by`, `--has-children`, `--blocked`. The last column is the author as `handle (DID)`; JSON adds `author` and `authorHandle`. | reader |
+| `issue list` | List Issues. `--state open|closed|all` and relation filters `--parent`, `--related`, `--blocking`, `--blocked-by`, `--has-children`, `--blocked`. The last column is the author as `handle (DID)`; JSON adds `author` and `authorHandle`. `--search WORDS` keeps Issues whose title, body, or comments contain every word (substring, up to 16 words); it adds a `MATCHED` column and `matchedIn`, and cannot be combined with relation filters. `--sort number|created|updated` and `--order asc|desc` order the list or the search (default: ascending number); `updated` is the last change to the Issue itself, not its comments, and JSON adds `updatedAt`. A server that predates sorting fails with `SortUnsupported` instead of returning number order. | reader |
 | `issue view ISSUE` | Show an Issue with its author as `handle (DID)`, its relations and, except with `--json`, its comments. JSON adds `author` and `authorHandle`. | reader |
 | `issue edit ISSUE` | Edit the title or body, or change exactly one relation (`--parent`, `--remove-parent`, `--add-sub-issue`, `--remove-sub-issue`, `--add-related`, `--remove-related`, `--add-blocking`, `--remove-blocking`, `--add-blocked-by`, `--remove-blocked-by`). Repeating a relation option is rejected. | writer |
 | `issue close ISSUE` | Close an Issue. | writer |
@@ -137,7 +137,7 @@ even when the text is unchanged; an unchanged `--editor` session sends nothing.
 | Command | Purpose | Who |
 | --- | --- | --- |
 | `pr create --title TITLE` | Create a PR from `--head` into `--base` (`--body`, `--body-file`). | writer |
-| `pr list` | List PRs (`--state open|closed|merged|all`, `--author DID`). | reader |
+| `pr list` | List PRs (`--state open|closed|merged|all`, `--author DID`). `--search WORDS` keeps PRs whose title, body, comments, or reviews contain every word, like `issue list --search`; it cannot be combined with `--author`. `--sort number|created|updated` and `--order asc|desc` work as in `issue list`; `updated` does not count comments or reviews. | reader |
 | `pr view NUMBER` | Show a PR with its rounds; the human output ends with the current round's reviews. JSON stays the PR alone. | reader |
 | `pr edit NUMBER` | Edit the title or body (`--title`, `--body`, `--body-file`, `--editor`). | writer |
 | `pr diff NUMBER` | Show the unified diff for a round (`--round`, `--color`, `--no-pager`). | reader |
@@ -150,7 +150,8 @@ even when the text is unchanged; an unchanged `--editor` session sends nothing.
 | `pr threads NUMBER` | List blocking threads by state: `unresolved` in the round raised or last confirmed, `pending-recheck` once a later round exists, `resolved`. A thread whose lines a later round left unchanged is carried over and stays `unresolved`. Shows the earlier excerpt, any proposal, and `Now:` with the estimated place and excerpt in the current round. `--state` filters; JSON is `threads[]` of comment views with `threadState`, `proposedVerdict`, and `currentLocation`. | reader |
 | `pr resolve NUMBER --thread URI --verdict VERDICT --reason TEXT` | Give a verdict on a blocking thread: `addressed`, `no-longer-applies`, or `still-applies` (with `--at` for its location in the current round; without `--at`, the estimated place is used when it is inside the round's diff). The thread's author and repository admins decide; the PR author can only propose `addressed` or `no-longer-applies`. Supports `--idempotency-key` and `--dry-run`. | writer |
 | `pr merge NUMBER --match-head-commit SHA` | Merge the reviewed head. Use `--dry-run` first. | writer; protected default branch needs admin |
-| `pr close NUMBER` | Close an open PR without merging it (no reopen). `--comment-file PATH` (`-` for stdin) posts a comment first; if the close then fails, exit 3 with `PullRequestClosePending`, and a retry with the same `--idempotency-key` closes without posting the comment again (`PullRequestCloseRefused` means it was closed or merged meanwhile; do not retry). Refuses merged (`PullRequestMerged`), closed (`PullRequestClosed`), and merging (`PullRequestMergeInProgress`) PRs. Supports `--dry-run`. | writer |
+| `pr close NUMBER` | Close an open PR without merging it (`pr reopen` opens it again). `--comment-file PATH` (`-` for stdin) posts a comment first; if the close then fails, exit 3 with `PullRequestClosePending`, and a retry with the same `--idempotency-key` closes without posting the comment again (`PullRequestCloseRefused` means it was closed or merged meanwhile; do not retry). Refuses merged (`PullRequestMerged`), closed (`PullRequestClosed`), and merging (`PullRequestMergeInProgress`) PRs. Supports `--dry-run`. | writer |
+| `pr reopen NUMBER` | Reopen a closed PR. Same `--comment-file`, `--idempotency-key`, and `--dry-run` behavior as `pr close` (`PullRequestReopenPending` / `PullRequestReopenRefused`). Refuses open (`PullRequestOpen`) and merged (`PullRequestMerged`) PRs, and PRs whose base and head another open PR uses (`PullRequestOpenConflict`). Warns when the head or base branch is missing. | writer |
 
 ## Events
 

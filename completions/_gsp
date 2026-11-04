@@ -792,6 +792,8 @@ _gsp_repo_blob() {
         '--ref[Git branch, tag, or reachable commit]:ref:'
         ':path:'
         ':repository:'
+        '--no-pager[Write directly without an external viewer or pager]'
+        '--color[Color mode for an external viewer\: auto, always, or never]:color:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -1644,6 +1646,8 @@ _gsp_issue_list() {
     local -i ret=1
     local -ar ___session_store=('keychain' 'file')
     local -ar ___state=('open' 'closed' 'all')
+    local -ar ___sort=('number' 'created' 'updated')
+    local -ar ___order=('asc' 'desc')
     local -ar arg_specs=(
         '--json[Emit stable machine-readable JSON]'
         '--verbose[Emit diagnostic details]'
@@ -1661,6 +1665,9 @@ _gsp_issue_list() {
         '--blocked-by[Filter by an issue blocking this issue]:blocked-by:'
         '--has-children[Filter to issues with children]'
         '--blocked[Filter to issues with open blockers]'
+        '--search[Show only issues whose title, body, or comments contain every word (substring match)]:search:'
+        '--sort[Sort by number, created, or updated (default\: number). updated is the last change to the item itself; comments and reviews do not advance it]:sort:{__gsp_complete "${___sort[@]}"}'
+        '--order[Sort order\: asc or desc (default\: asc)]:order:{__gsp_complete "${___order[@]}"}'
         '--no-pager[Write the list directly without an external pager]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
@@ -1911,12 +1918,13 @@ _gsp_pr() {
             'status:'
             'merge:'
             'close:'
+            'reopen:'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge|close)
+        create|list|view|edit|diff|comment|edit-comment|comments|review|reviews|threads|resolve|status|merge|close|reopen)
             "_gsp_pr_${words[1]}" && ret=0
             ;;
         esac
@@ -1955,6 +1963,8 @@ _gsp_pr_create() {
 _gsp_pr_list() {
     local -i ret=1
     local -ar ___session_store=('keychain' 'file')
+    local -ar ___sort=('number' 'created' 'updated')
+    local -ar ___order=('asc' 'desc')
     local -ar arg_specs=(
         '--json[Emit stable machine-readable JSON]'
         '--verbose[Emit diagnostic details]'
@@ -1965,6 +1975,9 @@ _gsp_pr_list() {
         '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
         '--state[Filter by state\: open, closed, merged, or all]:state:'
         '--author[Filter by author DID]:author:'
+        '--search[Show only pull requests whose title, body, comments, or reviews contain every word (substring match)]:search:'
+        '--sort[Sort by number, created, or updated (default\: number). updated is the last change to the item itself; comments and reviews do not advance it]:sort:{__gsp_complete "${___sort[@]}"}'
+        '--order[Sort order\: asc or desc (default\: asc)]:order:{__gsp_complete "${___order[@]}"}'
         '--skip[Number of resources to skip before returning results (>=0)]:skip:'
         '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
         '--no-pager[Write the list directly without an external pager]'
@@ -2290,6 +2303,29 @@ _gsp_pr_close() {
         '--comment-file[Post a comment from a file before closing; use - for stdin]:comment-file:'
         '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
         '--dry-run[Describe the operation without posting the comment or closing]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_pr_reopen() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain or file]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Select a repository using OWNER/NAME]:repo:'
+        ':number:'
+        '--comment-file[Post a comment from a file before reopening; use - for stdin]:comment-file:'
+        '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
+        '--dry-run[Describe the operation without posting the comment or reopening]'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
