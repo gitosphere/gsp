@@ -175,6 +175,19 @@ An event consumer that restarts the command can resume like this:
 gsp events watch --repo OWNER/NAME ${CURSOR:+--after "$CURSOR"}
 ```
 
+## Notifications
+
+A notification records that someone mentioned you in an Issue, a pull request, or a comment on
+either. It carries who, where, and when, never the text; read the target again for its content.
+You only ever see your own notifications, and only for repositories you can still read. Editing a
+body notifies only the people it newly mentions. Reviews do not notify yet.
+
+| Command | Purpose | Who |
+| --- | --- | --- |
+| `notifications list` | Your unread notifications, newest first (`--all` includes read ones; `--skip`, `--max-count`, `--no-pager`). JSON has `notifications` with `id`, `actor`, `repository`, `subject` (`kind`, `issueNumber` or `pullRequestNumber`, `recordUri`), `createdAt`, and `read`. `gsp notifications` alone runs this. | you |
+| `notifications show ID` | Show the Issue or pull request the notification points to (as `issue view` or `pr view` does) and mark it read. JSON has `notification` and `view`, the `result` of that view. A missing notification, another user's, or one you can no longer read exits 3 with `RecordNotFound`; if the target cannot be shown, its error is returned and the notification stays unread. | you |
+| `notifications read ID...` / `notifications read --all` | Mark notifications read. With IDs, if any is not yours or not readable, nothing is marked (`RecordNotFound`). JSON has `ids`. | you |
+
 ## Shell completion
 
 | Command | Purpose | Who |

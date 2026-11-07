@@ -187,13 +187,13 @@ _gsp() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|completion|help)
+    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|notifications|completion|help)
         # Offer subcommand argument completions
         "_gsp_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr events completion help' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr events notifications completion help' -- "${cur}"))
         ;;
     esac
 }
@@ -3080,6 +3080,101 @@ _gsp_events_watch() {
         return
         ;;
     '--interval')
+        return
+        ;;
+    esac
+}
+
+_gsp_notifications() {
+    repeating_flags=()
+    non_repeating_flags=(--version -h --help)
+    repeating_options=()
+    non_repeating_options=()
+    __gsp_offer_flags_options 0
+
+    # Offer subcommand / subcommand argument completions
+    local -r subcommand="${unparsed_words[0]}"
+    unset 'unparsed_words[0]'
+    unparsed_words=("${unparsed_words[@]}")
+    case "${subcommand}" in
+    list|show|read)
+        # Offer subcommand argument completions
+        "_gsp_notifications_${subcommand}"
+        ;;
+    *)
+        # Offer subcommand completions
+        COMPREPLY+=($(compgen -W 'list show read' -- "${cur}"))
+        ;;
+    esac
+}
+
+_gsp_notifications_list() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --all --no-pager --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store --skip --max-count)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '--skip')
+        return
+        ;;
+    '--max-count')
+        return
+        ;;
+    esac
+}
+
+_gsp_notifications_show() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    esac
+}
+
+_gsp_notifications_read() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --all --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store)
+    __gsp_offer_flags_options -1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
         return
         ;;
     esac

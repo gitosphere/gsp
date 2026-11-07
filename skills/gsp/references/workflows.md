@@ -26,8 +26,10 @@ URL as sensitive and do not copy it into Issues, PRs, or validation artifacts.
 
 For `auth login`, omitting `--session-store` selects the platform default,
 even when the profile currently records another store. On macOS this is
-Keychain; Linux follows the default documented by the repository's
-authentication guide. Specify `--session-store file` to choose file storage
+Keychain; on Linux it is file storage, because Linux has no Keychain backend.
+On Linux, `--session-store keychain` (or a profile that records Keychain)
+prints one warning on stderr and uses file storage; `auth status --json` then
+reports `sessionStore: file`. Specify `--session-store file` to choose file storage
 for that login. The selected store is recorded in the profile after successful
 login; status and logout use that recorded store. File storage is protected
 local JSON, not encrypted storage. Do not switch stores or profiles merely to
