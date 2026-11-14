@@ -28,7 +28,7 @@ column as guidance, not as a permission check.
 | Command | Purpose | Who |
 | --- | --- | --- |
 | `auth login [ACCOUNT]` | Authorize and store a DPoP-bound session. Interactive OAuth; `--no-browser` and `--callback-port` support SSH, `--pds` overrides the PDS origin, and `--permission-set` selects the OAuth permission set (default `dev.gitosphere.authRepository`). | Any user |
-| `auth status` | Show non-secret session status: account, server, realm, store, expiry, `refreshable`. Does not refresh. | Any user |
+| `auth status` | Show non-secret session status: account, server, realm, store, expiry, `refreshable`, and when present the PDS session start and end (`pdsSessionStartedAt`, `pdsSessionExpiresAt`). Does not refresh. | Any user |
 | `auth logout` | Delete the selected profile's session. | Any user |
 | `auth use PROFILE` | Select the default profile without changing its credentials. | Any user |
 | `auth id-token --audience AUD --repo OWNER/NAME` | Issue a short-lived OIDC ID token for the signed-in account acting for one repository, for a relying party such as Claude API Workload Identity Federation. `--repo` is required and needs read access. `--lifetime SECONDS` (60-3600, default 300) sets how long it stays valid; `--output FILE` writes the token with mode 0600 instead of standard output. A token can be exchanged once, so issue one per exchange. A server without an ID token key fails with `IdTokenIssuerNotConfigured` (exit 3). | reader |
@@ -167,13 +167,24 @@ without holding the cursor back. Event types are listed in the server's
 | Command | Purpose | Who |
 | --- | --- | --- |
 | `events list` | Print events after `--after`, from the oldest kept event without it (`--kind`, `--max-count` up to 1000, `--no-pager`). JSON has `events` and `nextCursor`. `gsp events` alone runs this. | reader |
-| `events watch` | Keep polling (`--interval`, default 10 seconds) and print each new event as one JSON line. Without `--after` it starts from now. Temporary failures are retried; other failures exit with their status. | reader |
+| `events watch` | Keep polling (`--interval`, default 10 seconds) and print each new event as one JSON line. Without `--after` it starts from now. Temporary failures are retried; other failures exit with their status. `--pull-request`, `--issue`, `--actor` and `--round` print only matching events (all must match). `--count N` exits 0 after N matching lines; `--wait-seconds S` (requires `--count`) exits 75 (`EventWaitTimedOut`) if they do not arrive in time. | reader |
 
 An event consumer that restarts the command can resume like this:
 
 ```sh
 gsp events watch --repo OWNER/NAME ${CURSOR:+--after "$CURSOR"}
 ```
+
+To wait for one event and get control back when it arrives, let the command end by itself
+instead of piping it into `grep -m1` or `jq` (gsp only notices a closed pipe on its next write):
+
+```sh
+gsp events watch --repo OWNER/NAME --kind pullRequest.review.submitted \
+  --actor did:plc:REVIEWER --pull-request 12 --count 1 --wait-seconds 1200
+```
+
+Exit 0 means the line was printed; resume later from its `cursor`. Exit 75 with
+`EventWaitTimedOut` means nothing matched in time; read the state directly before waiting again.
 
 ## Notifications
 
@@ -187,6 +198,22 @@ body notifies only the people it newly mentions. Reviews do not notify yet.
 | `notifications list` | Your unread notifications, newest first (`--all` includes read ones; `--skip`, `--max-count`, `--no-pager`). JSON has `notifications` with `id`, `actor`, `repository`, `subject` (`kind`, `issueNumber` or `pullRequestNumber`, `recordUri`), `createdAt`, and `read`. `gsp notifications` alone runs this. | you |
 | `notifications show ID` | Show the Issue or pull request the notification points to (as `issue view` or `pr view` does) and mark it read. JSON has `notification` and `view`, the `result` of that view. A missing notification, another user's, or one you can no longer read exits 3 with `RecordNotFound`; if the target cannot be shown, its error is returned and the notification stays unread. | you |
 | `notifications read ID...` / `notifications read --all` | Mark notifications read. With IDs, if any is not yours or not readable, nothing is marked (`RecordNotFound`). JSON has `ids`. | you |
+
+### Delivery to your own destination
+
+A destination also receives a short message for each new mention: who, where, and a
+`gsp notifications show` command, never the text. Today the destination is one webhook, such as
+an ntfy topic. Its URL is a secret: give it with `--url-file PATH` or `--url-file -` (stdin), never
+on the command line. The server keeps it encrypted and shows only its host. A server without a
+delivery key refuses with `NotificationDeliveryUnavailable` (exit 3, category `configuration`,
+not retryable).
+
+| Command | Purpose | Who |
+| --- | --- | --- |
+| `notify status` | Whether the server delivers (`available`), your destinations (`kind`, `format`, `enabled`, `host`, `createdAt`, `updatedAt`), and your 20 most recent deliveries (`id`, `kind`, `notificationId`, absent for a test message, `state`, `attempts`, `errorCode`, `createdAt`, `finishedAt`). | you |
+| `notify webhook set --url-file PATH\|-` | Set or replace your webhook. The URL must be https on port 443 at a host the server allows (ntfy.sh by default); otherwise `WebhookHostNotAllowed` or `ValidationFailed` (exit 3). `--format text\|json` (server default `text`), `--disable` keeps it without sending, `--dry-run` validates without saving. JSON has `destination` and `dryRun`. Example: `printf '%s' https://ntfy.sh/TOPIC \| gsp notify webhook set --url-file -`. | you |
+| `notify webhook remove` | Remove your webhook. JSON has `deleted` (false when there was none). | you |
+| `notify test` | Queue one test message for each enabled destination; see how it ended with `notify status`. JSON has `deliveryIds` (empty when none is enabled). | you |
 
 ## Shell completion
 

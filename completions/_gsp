@@ -71,6 +71,7 @@ _gsp() {
             'pr:Manage pull requests in a Gitosphere repository'
             'events:Read the event feed of a repository'
             'notifications:List, show, and mark read the mentions of you in Issues and pull requests'
+            'notify:Choose where your mention notifications are also delivered'
             'completion:Generate a shell completion script'
             'help:Show subcommand help information.'
         )
@@ -78,7 +79,7 @@ _gsp() {
         ;;
     arg)
         case "${words[1]}" in
-        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|notifications|completion|help)
+        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|notifications|notify|completion|help)
             "_gsp_${words[1]}" && ret=0
             ;;
         esac
@@ -2401,6 +2402,12 @@ _gsp_events_watch() {
         '--after[Continue after this event cursor]:after:'
         '*--kind[Only print this event type; repeat for more. Filtering does not change cursors]:kind:'
         '--interval[Seconds to wait between polls when no new event is available (1-3600)]:interval:'
+        '--pull-request[Only print events of this pull request number]:pull-request:'
+        '--issue[Only print events of this issue number]:issue:'
+        '--actor[Only print events by this actor DID]:actor:'
+        '--round[Only print events of this pull request round]:round:'
+        '--count[Exit 0 after printing this many matching events (1-1000)]:count:'
+        '--wait-seconds[Exit 75 if --count is not reached within this many seconds (1-86400; requires --count)]:wait-seconds:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
@@ -2492,6 +2499,142 @@ _gsp_notifications_read() {
         '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
         '*:ids:'
         '--all[Mark every unread notification read]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify() {
+    local -i ret=1
+    local -ar arg_specs=(
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+    case "${state}" in
+    command)
+        local -ar subcommands=(
+            'status:Show your destinations and your most recent deliveries'
+            'webhook:Set or remove your webhook destination'
+            'test:Send a test message to each enabled destination'
+        )
+        _describe -V subcommand subcommands && ret=0
+        ;;
+    arg)
+        case "${words[1]}" in
+        status|webhook|test)
+            "_gsp_notify_${words[1]}" && ret=0
+            ;;
+        esac
+        ;;
+    esac
+
+    return "${ret}"
+}
+
+_gsp_notify_status() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify_webhook() {
+    local -i ret=1
+    local -ar arg_specs=(
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+    case "${state}" in
+    command)
+        local -ar subcommands=(
+            'set:Set or replace your webhook destination'
+            'remove:Remove your webhook destination'
+        )
+        _describe -V subcommand subcommands && ret=0
+        ;;
+    arg)
+        case "${words[1]}" in
+        set|remove)
+            "_gsp_notify_webhook_${words[1]}" && ret=0
+            ;;
+        esac
+        ;;
+    esac
+
+    return "${ret}"
+}
+
+_gsp_notify_webhook_set() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar ___format=('text' 'json')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--dry-run[Describe the operation without applying it]'
+        '--url-file[Read the webhook URL from a file; use - for stdin]:url-file:'
+        '--format[Message format\: text (one line, the default) or json]:format:{__gsp_complete "${___format[@]}"}'
+        '--disable[Keep the destination but send nothing to it]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify_webhook_remove() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify_test() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

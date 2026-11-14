@@ -1,6 +1,6 @@
 ---
 name: gsp
-description: Use the gsp CLI to discover Gitosphere repositories, manage authentication, organizations and members, work with issues and pull requests, inspect access decisions and audit events, or configure Git access. Use for Gitosphere operations through the installed CLI; use ordinary Git for local history, branches, commits, fetches, and pushes.
+description: Use the gsp CLI to discover Gitosphere repositories, manage authentication, organizations and members, work with issues and pull requests, read mention notifications and choose where they are delivered, inspect access decisions and audit events, or configure Git access. Use for Gitosphere operations through the installed CLI; use ordinary Git for local history, branches, commits, fetches, and pushes.
 ---
 
 # Use Gitosphere through gsp
@@ -21,7 +21,9 @@ subsequent history, branch, commit, fetch, and push operations.
    use `auth status --json` to check the account, server origin, security realm,
    session store, expiry, `refreshable`, and pending cleanup. Status does not
    refresh credentials: an expired status with `refreshable: true` is not alone
-   a reason to log out or request a new login. Public repository search does not
+   a reason to log out or request a new login. `refreshable` only means a refresh
+   token is stored. The PDS session itself ends two weeks after `auth login`;
+   `pdsSessionExpiresAt`, when present, shows that time. Public repository search does not
    require a signed-in profile. Other reads may require authentication.
 3. Resolve the exact target before acting. Prefer the user's explicit repository
    and profile; use current-clone resolution only when it matches the intended

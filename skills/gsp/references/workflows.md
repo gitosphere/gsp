@@ -18,6 +18,12 @@ profile and deployment explicit throughout the task. A normal authenticated
 request can refresh an expired but refreshable session. If it fails, interpret
 the actual error before deciding whether interactive login is needed.
 
+A PDS OAuth session ends two weeks after `auth login`, however often it is
+refreshed. When `pdsSessionExpiresAt` is present, it shows that time; ask the
+user to log in again before it for long-running or unattended use. After the
+session ends, refreshes fail with `OAuthAuthorizationRejected` (`invalid_grant`)
+and the message says to run `auth login` again.
+
 When login is required, the user completes OAuth for the intended account.
 `auth login ACCOUNT` is interactive; `--non-interactive` is not a substitute for
 user consent. For SSH, `--no-browser` and `--callback-port PORT` support a browser

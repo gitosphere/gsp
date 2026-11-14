@@ -187,13 +187,13 @@ _gsp() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|notifications|completion|help)
+    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|notifications|notify|completion|help)
         # Offer subcommand argument completions
         "_gsp_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr events notifications completion help' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr events notifications notify completion help' -- "${cur}"))
         ;;
     esac
 }
@@ -3055,7 +3055,7 @@ _gsp_events_watch() {
     repeating_flags=()
     non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
     repeating_options=(--kind)
-    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --after --interval)
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --after --interval --pull-request --issue --actor --round --count --wait-seconds)
     __gsp_offer_flags_options 0
 
     # Offer option value completions
@@ -3080,6 +3080,24 @@ _gsp_events_watch() {
         return
         ;;
     '--interval')
+        return
+        ;;
+    '--pull-request')
+        return
+        ;;
+    '--issue')
+        return
+        ;;
+    '--actor')
+        return
+        ;;
+    '--round')
+        return
+        ;;
+    '--count')
+        return
+        ;;
+    '--wait-seconds')
         return
         ;;
     esac
@@ -3164,6 +3182,147 @@ _gsp_notifications_read() {
     repeating_options=()
     non_repeating_options=(--profile --timeout-seconds --session-store)
     __gsp_offer_flags_options -1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    esac
+}
+
+_gsp_notify() {
+    repeating_flags=()
+    non_repeating_flags=(--version -h --help)
+    repeating_options=()
+    non_repeating_options=()
+    __gsp_offer_flags_options 0
+
+    # Offer subcommand / subcommand argument completions
+    local -r subcommand="${unparsed_words[0]}"
+    unset 'unparsed_words[0]'
+    unparsed_words=("${unparsed_words[@]}")
+    case "${subcommand}" in
+    status|webhook|test)
+        # Offer subcommand argument completions
+        "_gsp_notify_${subcommand}"
+        ;;
+    *)
+        # Offer subcommand completions
+        COMPREPLY+=($(compgen -W 'status webhook test' -- "${cur}"))
+        ;;
+    esac
+}
+
+_gsp_notify_status() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    esac
+}
+
+_gsp_notify_webhook() {
+    repeating_flags=()
+    non_repeating_flags=(--version -h --help)
+    repeating_options=()
+    non_repeating_options=()
+    __gsp_offer_flags_options 0
+
+    # Offer subcommand / subcommand argument completions
+    local -r subcommand="${unparsed_words[0]}"
+    unset 'unparsed_words[0]'
+    unparsed_words=("${unparsed_words[@]}")
+    case "${subcommand}" in
+    set|remove)
+        # Offer subcommand argument completions
+        "_gsp_notify_webhook_${subcommand}"
+        ;;
+    *)
+        # Offer subcommand completions
+        COMPREPLY+=($(compgen -W 'set remove' -- "${cur}"))
+        ;;
+    esac
+}
+
+_gsp_notify_webhook_set() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --disable --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store --url-file --format)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '--url-file')
+        return
+        ;;
+    '--format')
+        __gsp_add_completions -W 'text'$'\n''json'
+        return
+        ;;
+    esac
+}
+
+_gsp_notify_webhook_remove() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    esac
+}
+
+_gsp_notify_test() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store)
+    __gsp_offer_flags_options 0
 
     # Offer option value completions
     case "${prev}" in
