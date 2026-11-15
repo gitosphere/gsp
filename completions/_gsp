@@ -2521,13 +2521,14 @@ _gsp_notify() {
         local -ar subcommands=(
             'status:Show your destinations and your most recent deliveries'
             'webhook:Set or remove your webhook destination'
+            'email:Set, verify, or remove your email destination'
             'test:Send a test message to each enabled destination'
         )
         _describe -V subcommand subcommands && ret=0
         ;;
     arg)
         case "${words[1]}" in
-        status|webhook|test)
+        status|webhook|email|test)
             "_gsp_notify_${words[1]}" && ret=0
             ;;
         esac
@@ -2617,6 +2618,114 @@ _gsp_notify_webhook_remove() {
         '--profile[Select a configured profile]:profile:'
         '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
         '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify_email() {
+    local -i ret=1
+    local -ar arg_specs=(
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+    case "${state}" in
+    command)
+        local -ar subcommands=(
+            'set:Mail a verification code to an email address'
+            'verify:Verify your email address with the mailed code'
+            'remove:Remove your email destination and any address waiting to be verified'
+            'prompt:Choose whether gsp auth login offers to add an email address'
+        )
+        _describe -V subcommand subcommands && ret=0
+        ;;
+    arg)
+        case "${words[1]}" in
+        set|verify|remove|prompt)
+            "_gsp_notify_email_${words[1]}" && ret=0
+            ;;
+        esac
+        ;;
+    esac
+
+    return "${ret}"
+}
+
+_gsp_notify_email_set() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--dry-run[Describe the operation without applying it]'
+        ':address:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify_email_verify() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        ':code:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify_email_remove() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_notify_email_prompt() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar _choice=('ask' 'never')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        ':choice:{__gsp_complete "${_choice[@]}"}'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

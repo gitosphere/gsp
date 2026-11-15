@@ -27,7 +27,7 @@ column as guidance, not as a permission check.
 
 | Command | Purpose | Who |
 | --- | --- | --- |
-| `auth login [ACCOUNT]` | Authorize and store a DPoP-bound session. Interactive OAuth; `--no-browser` and `--callback-port` support SSH, `--pds` overrides the PDS origin, and `--permission-set` selects the OAuth permission set (default `dev.gitosphere.authRepository`). | Any user |
+| `auth login [ACCOUNT]` | Authorize and store a DPoP-bound session. Interactive OAuth; `--no-browser` and `--callback-port` support SSH, `--pds` overrides the PDS origin, and `--permission-set` selects the OAuth permission set (default `dev.gitosphere.authRepository`). After a successful login at a terminal, it may offer on stderr to add an email address for mention notifications (see `notify email`). | Any user |
 | `auth status` | Show non-secret session status: account, server, realm, store, expiry, `refreshable`, and when present the PDS session start and end (`pdsSessionStartedAt`, `pdsSessionExpiresAt`). Does not refresh. | Any user |
 | `auth logout` | Delete the selected profile's session. | Any user |
 | `auth use PROFILE` | Select the default profile without changing its credentials. | Any user |
@@ -202,17 +202,39 @@ body notifies only the people it newly mentions. Reviews do not notify yet.
 ### Delivery to your own destination
 
 A destination also receives a short message for each new mention: who, where, and a
-`gsp notifications show` command, never the text. Today the destination is one webhook, such as
-an ntfy topic. Its URL is a secret: give it with `--url-file PATH` or `--url-file -` (stdin), never
-on the command line. The server keeps it encrypted and shows only its host. A server without a
-delivery key refuses with `NotificationDeliveryUnavailable` (exit 3, category `configuration`,
-not retryable).
+`gsp notifications show` command, never the text. You can have one webhook, such as an ntfy topic,
+and one email address. A webhook URL is a secret: give it with `--url-file PATH` or `--url-file -`
+(stdin), never on the command line. The server keeps it encrypted and shows only its host. A server
+without a delivery key refuses with `NotificationDeliveryUnavailable` (exit 3, category
+`configuration`, not retryable).
+
+An email address becomes a destination only after you verify it: `notify email set ADDRESS` mails a
+six-digit code, and `notify email verify CODE` finishes. Nothing else is sent to it before that, and
+an address you verified earlier keeps receiving until the new one is verified. Output shows the
+address only masked (`maskedAddress`, such as `b***@example.com`). A code works for 15 minutes and
+five tries; a wrong, expired, or used-up code all fail as `EmailVerificationFailed` (exit 3). Codes
+are mailed at most once a minute and five times a day (`EmailVerificationRateLimited`, exit 75,
+retryable later). A server that does not send email refuses with `EmailDeliveryUnavailable` (exit
+3, category `configuration`, not retryable).
+
+After `auth login` succeeds, gsp may ask on stderr whether to add an email address: yes (enter the
+address and the code, or leave the code for `notify email verify`), later (ask at the next login),
+or never (saved on the server, so other devices do not ask; undo with `notify email prompt ask`). It asks only at a terminal: not with
+`--json` or `--non-interactive`, not when stdin is not a TTY or `GITOSPHERE_PROMPT_DISABLED` is set,
+and not when the server does not send email, you already have an email destination, or you chose
+never. A sent but unverified address is not a destination yet, so the next login asks again. A
+failed step prints one line on stderr; whatever happens there, the login's output and exit code do
+not change.
 
 | Command | Purpose | Who |
 | --- | --- | --- |
-| `notify status` | Whether the server delivers (`available`), your destinations (`kind`, `format`, `enabled`, `host`, `createdAt`, `updatedAt`), and your 20 most recent deliveries (`id`, `kind`, `notificationId`, absent for a test message, `state`, `attempts`, `errorCode`, `createdAt`, `finishedAt`). | you |
+| `notify status` | Whether the server delivers (`available`) and sends email (`emailAvailable`, absent from older servers), whether login offers email (`emailPrompt`: `ask` or `never`), your destinations (`kind`, `format`, `enabled`, `host`, `maskedAddress` for email, `createdAt`, `updatedAt`), and your 20 most recent deliveries (`id`, `kind`, `notificationId`, absent for a test message, `state`, `attempts`, `errorCode`, `createdAt`, `finishedAt`). | you |
 | `notify webhook set --url-file PATH\|-` | Set or replace your webhook. The URL must be https on port 443 at a host the server allows (ntfy.sh by default); otherwise `WebhookHostNotAllowed` or `ValidationFailed` (exit 3). `--format text\|json` (server default `text`), `--disable` keeps it without sending, `--dry-run` validates without saving. JSON has `destination` and `dryRun`. Example: `printf '%s' https://ntfy.sh/TOPIC \| gsp notify webhook set --url-file -`. | you |
 | `notify webhook remove` | Remove your webhook. JSON has `deleted` (false when there was none). | you |
+| `notify email set ADDRESS` | Mail a verification code to ADDRESS. `--dry-run` checks the address without mailing. JSON has `maskedAddress`, `expiresAt` (absent for a dry run), and `dryRun`. An address the server does not send to fails as `InvalidEmailAddress` (exit 3). | you |
+| `notify email verify CODE` | Verify your address with the mailed code; it then receives your mentions. JSON has `destination`. | you |
+| `notify email remove` | Remove your email destination and any address waiting to be verified. JSON has `deleted`. | you |
+| `notify email prompt ask\|never` | Choose whether `auth login` offers to add an email address (`ask`) or not (`never`). Saved on the server, so it applies on every machine and profile. JSON has `emailPrompt`. | you |
 | `notify test` | Queue one test message for each enabled destination; see how it ended with `notify status`. JSON has `deliveryIds` (empty when none is enabled). | you |
 
 ## Shell completion
