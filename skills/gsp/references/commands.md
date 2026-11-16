@@ -132,6 +132,14 @@ Treat invitation codes as secrets.
 Passing `--body` or `--body-file` to `issue edit` stores the body as Markdown
 even when the text is unchanged; an unchanged `--editor` session sends nothing.
 
+When gsp opens an editor, it sets `GITOSPHERE_EDIT_KIND` (`issue`, `pullRequest`, `issueComment`,
+`pullRequestComment`, or `pullRequestReview`), `GITOSPHERE_EDIT_ACTION` (`create` or `edit`),
+`GITOSPHERE_EDIT_NUMBER` (the Issue or pull request number, when there is one), and `GITOSPHERE_REPO`
+(a value `--repo` accepts) in the editor's environment, plus `GITOSPHERE_PROFILE`,
+`GITOSPHERE_SERVER_ORIGIN`, `GITOSPHERE_SECURITY_REALM_ID`, and `GITOSPHERE_ACCOUNT` when the run chose
+them. gsp started inside the editor therefore talks to the same server and repository. Only
+identifiers are passed, never a token, a session, or the body.
+
 ## Pull requests
 
 | Command | Purpose | Who |
@@ -152,6 +160,16 @@ even when the text is unchanged; an unchanged `--editor` session sends nothing.
 | `pr merge NUMBER --match-head-commit SHA` | Merge the reviewed head. Use `--dry-run` first. | writer; protected default branch needs admin |
 | `pr close NUMBER` | Close an open PR without merging it (`pr reopen` opens it again). `--comment-file PATH` (`-` for stdin) posts a comment first; if the close then fails, exit 3 with `PullRequestClosePending`, and a retry with the same `--idempotency-key` closes without posting the comment again (`PullRequestCloseRefused` means it was closed or merged meanwhile; do not retry). Refuses merged (`PullRequestMerged`), closed (`PullRequestClosed`), and merging (`PullRequestMergeInProgress`) PRs. Supports `--dry-run`. | writer |
 | `pr reopen NUMBER` | Reopen a closed PR. Same `--comment-file`, `--idempotency-key`, and `--dry-run` behavior as `pr close` (`PullRequestReopenPending` / `PullRequestReopenRefused`). Refuses open (`PullRequestOpen`) and merged (`PullRequestMerged`) PRs, and PRs whose base and head another open PR uses (`PullRequestOpenConflict`). Warns when the head or base branch is missing. | writer |
+
+## Mentions
+
+A body mentions someone with `@handle`; saving it resolves every handle to a DID and rejects ones
+that do not resolve. To find who to mention while writing:
+
+| Command | Purpose | Who |
+| --- | --- | --- |
+| `mention candidates` | Handles a body in the repository can mention (`-R/--repo`, else `GITOSPHERE_REPO` or the checkout). `--issue N` or `--pr N` puts that Issue's or pull request's author, commenters, and reviewers first; repository members follow, but only for people with a role on the repository. `--prefix TEXT` keeps handles starting with it (a leading `@` and ASCII case are ignored). JSON has `candidates` (`did`, `handle`, `reasons`) and `complete`; `complete: false` means some handles could not be checked in time, so run it again. A server without the method exits 3 with `MentionCandidatesUnsupported`. | repository reader |
+| `lsp` | A Language Server Protocol server on stdio for the editor, not for scripts. In an editor that gsp opened (`GITOSPHERE_EDIT_KIND` and `GITOSPHERE_REPO` set), typing `@` in a Markdown body offers the handles `mention candidates` lists, with the DID as the detail; not inside code, links, or images. Elsewhere it offers nothing and reports no error. Only completion is provided; keep a Markdown server for the rest. | repository reader |
 
 ## Events
 

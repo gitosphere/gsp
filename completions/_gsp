@@ -69,6 +69,8 @@ _gsp() {
             'audit:Inspect secret-safe Gitosphere audit events'
             'issue:Manage issues in a Gitosphere repository'
             'pr:Manage pull requests in a Gitosphere repository'
+            'mention:Find the handles a body can mention'
+            'lsp:Run a language server that completes @mentions in bodies'
             'events:Read the event feed of a repository'
             'notifications:List, show, and mark read the mentions of you in Issues and pull requests'
             'notify:Choose where your mention notifications are also delivered'
@@ -79,7 +81,7 @@ _gsp() {
         ;;
     arg)
         case "${words[1]}" in
-        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|events|notifications|notify|completion|help)
+        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|mention|lsp|events|notifications|notify|completion|help)
             "_gsp_${words[1]}" && ret=0
             ;;
         esac
@@ -2328,6 +2330,77 @@ _gsp_pr_reopen() {
         '--comment-file[Post a comment from a file before reopening; use - for stdin]:comment-file:'
         '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
         '--dry-run[Describe the operation without posting the comment or reopening]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_mention() {
+    local -i ret=1
+    local -ar arg_specs=(
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+    case "${state}" in
+    command)
+        local -ar subcommands=(
+            'candidates:List the handles a body in a repository can mention'
+        )
+        _describe -V subcommand subcommands && ret=0
+        ;;
+    arg)
+        case "${words[1]}" in
+        candidates)
+            "_gsp_mention_${words[1]}" && ret=0
+            ;;
+        esac
+        ;;
+    esac
+
+    return "${ret}"
+}
+
+_gsp_mention_candidates() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Repository as OWNER/NAME or a repository ID]:repo:'
+        '--issue[Add the author and commenters of this issue]:issue:'
+        '--pr[Add the author, commenters, and reviewers of this pull request]:pr:'
+        '--prefix[Keep handles that start with this text (a leading @ is ignored)]:prefix:'
+        '--skip[Number of resources to skip before returning results (>=0)]:skip:'
+        '--max-count[Maximum number of resources to return after skipping (>=1)]:max-count:'
+        '--no-pager[Write the list directly without an external pager]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_lsp() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )
