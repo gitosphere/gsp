@@ -69,6 +69,7 @@ _gsp() {
             'audit:Inspect secret-safe Gitosphere audit events'
             'issue:Manage issues in a Gitosphere repository'
             'pr:Manage pull requests in a Gitosphere repository'
+            'ruleset:Read and change the ref rules that guard pushes and merges'
             'mention:Find the handles a body can mention'
             'lsp:Run a language server that completes @mentions in bodies'
             'events:Read the event feed of a repository'
@@ -81,7 +82,7 @@ _gsp() {
         ;;
     arg)
         case "${words[1]}" in
-        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|mention|lsp|events|notifications|notify|completion|help)
+        auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|ruleset|mention|lsp|events|notifications|notify|completion|help)
             "_gsp_${words[1]}" && ret=0
             ;;
         esac
@@ -2330,6 +2331,154 @@ _gsp_pr_reopen() {
         '--comment-file[Post a comment from a file before reopening; use - for stdin]:comment-file:'
         '--idempotency-key[Idempotency key for safe retries; generated when omitted]:idempotency-key:'
         '--dry-run[Describe the operation without posting the comment or reopening]'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_ruleset() {
+    local -i ret=1
+    local -ar arg_specs=(
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+        '(-): :->command'
+        '(-)*:: :->arg'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+    case "${state}" in
+    command)
+        local -ar subcommands=(
+            'list:List the ref rules in the order they are applied'
+            'view:Show the rule with this pattern'
+            'check:Show the rule that applies to a branch or ref'
+            'set:Create the rule with this pattern, or change it'
+            'delete:Delete the rule with this pattern'
+        )
+        _describe -V subcommand subcommands && ret=0
+        ;;
+    arg)
+        case "${words[1]}" in
+        list|view|check|set|delete)
+            "_gsp_ruleset_${words[1]}" && ret=0
+            ;;
+        esac
+        ;;
+    esac
+
+    return "${ret}"
+}
+
+_gsp_ruleset_list() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Repository as OWNER/NAME or a repository ID]:repo:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_ruleset_view() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Repository as OWNER/NAME or a repository ID]:repo:'
+        ':pattern:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_ruleset_check() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Repository as OWNER/NAME or a repository ID]:repo:'
+        ':branch:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_ruleset_set() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Repository as OWNER/NAME or a repository ID]:repo:'
+        '--dry-run[Describe the operation without applying it]'
+        '--idempotency-key[Idempotency key for a mutation request]:idempotency-key:'
+        '--min-role[Lowest role that may change the ref\: writer, admin, or owner]:min-role:'
+        '--allow-create[Allow creating a matching ref]'
+        '--no-allow-create[Allow creating a matching ref]'
+        '--allow-update[Allow updating a matching ref]'
+        '--no-allow-update[Allow updating a matching ref]'
+        '--allow-delete[Allow deleting a matching ref]'
+        '--no-allow-delete[Allow deleting a matching ref]'
+        '--require-fast-forward[Refuse pushes that are not fast-forwards]'
+        '--no-require-fast-forward[Refuse pushes that are not fast-forwards]'
+        '--require-pull-request[Refuse direct pushes that update an existing branch; only merges update it]'
+        '--no-require-pull-request[Refuse direct pushes that update an existing branch; only merges update it]'
+        '--required-approvals[Approvals a merge into a matching branch needs (0-10)]:required-approvals:'
+        '--priority[Rules with a higher priority are applied first (0-1000)]:priority:'
+        ':pattern:'
+        '--version[Show the version.]'
+        '(-h --help)'{-h,--help}'[Show help information.]'
+    )
+    _arguments -w -s -S : "${arg_specs[@]}" && ret=0
+
+    return "${ret}"
+}
+
+_gsp_ruleset_delete() {
+    local -i ret=1
+    local -ar ___session_store=('keychain' 'file')
+    local -ar arg_specs=(
+        '--json[Emit stable machine-readable JSON]'
+        '--verbose[Emit diagnostic details]'
+        '--non-interactive[Disable all interactive prompts]'
+        '--profile[Select a configured profile]:profile:'
+        '--timeout-seconds[Request timeout in seconds]:timeout-seconds:'
+        '--session-store[Session storage\: keychain (default on macOS) or file (default on Linux, where keychain falls back to file)]:session-store:{__gsp_complete "${___session_store[@]}"}'
+        '(-R --repo)'{-R,--repo}'[Repository as OWNER/NAME or a repository ID]:repo:'
+        '--dry-run[Describe the operation without applying it]'
+        '--idempotency-key[Idempotency key for a mutation request]:idempotency-key:'
+        ':pattern:'
         '--version[Show the version.]'
         '(-h --help)'{-h,--help}'[Show help information.]'
     )

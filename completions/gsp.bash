@@ -187,13 +187,13 @@ _gsp() {
     unset 'unparsed_words[0]'
     unparsed_words=("${unparsed_words[@]}")
     case "${subcommand}" in
-    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|mention|lsp|events|notifications|notify|completion|help)
+    auth|org|member|repo|space|traffic|quota|invite|access|audit|issue|pr|ruleset|mention|lsp|events|notifications|notify|completion|help)
         # Offer subcommand argument completions
         "_gsp_${subcommand}"
         ;;
     *)
         # Offer subcommand completions
-        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr mention lsp events notifications notify completion help' -- "${cur}"))
+        COMPREPLY+=($(compgen -W 'auth org member repo space traffic quota invite access audit issue pr ruleset mention lsp events notifications notify completion help' -- "${cur}"))
         ;;
     esac
 }
@@ -2986,6 +2986,169 @@ _gsp_pr_reopen() {
         return
         ;;
     '--comment-file')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    esac
+}
+
+_gsp_ruleset() {
+    repeating_flags=()
+    non_repeating_flags=(--version -h --help)
+    repeating_options=()
+    non_repeating_options=()
+    __gsp_offer_flags_options 0
+
+    # Offer subcommand / subcommand argument completions
+    local -r subcommand="${unparsed_words[0]}"
+    unset 'unparsed_words[0]'
+    unparsed_words=("${unparsed_words[@]}")
+    case "${subcommand}" in
+    list|view|check|set|delete)
+        # Offer subcommand argument completions
+        "_gsp_ruleset_${subcommand}"
+        ;;
+    *)
+        # Offer subcommand completions
+        COMPREPLY+=($(compgen -W 'list view check set delete' -- "${cur}"))
+        ;;
+    esac
+}
+
+_gsp_ruleset_list() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo)
+    __gsp_offer_flags_options 0
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    esac
+}
+
+_gsp_ruleset_view() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    esac
+}
+
+_gsp_ruleset_check() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    esac
+}
+
+_gsp_ruleset_set() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --allow-create --no-allow-create --allow-update --no-allow-update --allow-delete --no-allow-delete --require-fast-forward --no-require-fast-forward --require-pull-request --no-require-pull-request --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --idempotency-key --min-role --required-approvals --priority)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
+        return
+        ;;
+    '--idempotency-key')
+        return
+        ;;
+    '--min-role')
+        return
+        ;;
+    '--required-approvals')
+        return
+        ;;
+    '--priority')
+        return
+        ;;
+    esac
+}
+
+_gsp_ruleset_delete() {
+    repeating_flags=()
+    non_repeating_flags=(--json --verbose --non-interactive --dry-run --version -h --help)
+    repeating_options=()
+    non_repeating_options=(--profile --timeout-seconds --session-store -R --repo --idempotency-key)
+    __gsp_offer_flags_options 1
+
+    # Offer option value completions
+    case "${prev}" in
+    '--profile')
+        return
+        ;;
+    '--timeout-seconds')
+        return
+        ;;
+    '--session-store')
+        __gsp_add_completions -W 'keychain'$'\n''file'
+        return
+        ;;
+    '-R'|'--repo')
         return
         ;;
     '--idempotency-key')

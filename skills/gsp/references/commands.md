@@ -157,9 +157,25 @@ identifiers are passed, never a token, a session, or the body.
 | `pr status NUMBER` | Show approvals with the approvers as `handle (DID)`, blocking findings (and how many wait for a re-check), and whether the PR is mergeable. JSON adds `approvers` (`did`, `handle`, `reviewUri`) next to `status`. | reader |
 | `pr threads NUMBER` | List blocking threads by state: `unresolved` in the round raised or last confirmed, `pending-recheck` once a later round exists, `resolved`. A thread whose lines a later round left unchanged is carried over and stays `unresolved`. Shows the earlier excerpt, any proposal, and `Now:` with the estimated place and excerpt in the current round. `--state` filters; JSON is `threads[]` of comment views with `threadState`, `proposedVerdict`, and `currentLocation`. | reader |
 | `pr resolve NUMBER --thread URI --verdict VERDICT --reason TEXT` | Give a verdict on a blocking thread: `addressed`, `no-longer-applies`, or `still-applies` (with `--at` for its location in the current round; without `--at`, the estimated place is used when it is inside the round's diff). The thread's author and repository admins decide; the PR author can only propose `addressed` or `no-longer-applies`. Supports `--idempotency-key` and `--dry-run`. | writer |
-| `pr merge NUMBER --match-head-commit SHA` | Merge the reviewed head. Use `--dry-run` first. | writer; protected default branch needs admin |
+| `pr merge NUMBER --match-head-commit SHA` | Merge the reviewed head. Use `--dry-run` first. The base branch's ref rule must allow updates and may require approvals (see Ref rules). | The base branch's rule `minimumRole` (admin for `main` by default) |
 | `pr close NUMBER` | Close an open PR without merging it (`pr reopen` opens it again). `--comment-file PATH` (`-` for stdin) posts a comment first; if the close then fails, exit 3 with `PullRequestClosePending`, and a retry with the same `--idempotency-key` closes without posting the comment again (`PullRequestCloseRefused` means it was closed or merged meanwhile; do not retry). Refuses merged (`PullRequestMerged`), closed (`PullRequestClosed`), and merging (`PullRequestMergeInProgress`) PRs. Supports `--dry-run`. | writer |
 | `pr reopen NUMBER` | Reopen a closed PR. Same `--comment-file`, `--idempotency-key`, and `--dry-run` behavior as `pr close` (`PullRequestReopenPending` / `PullRequestReopenRefused`). Refuses open (`PullRequestOpen`) and merged (`PullRequestMerged`) PRs, and PRs whose base and head another open PR uses (`PullRequestOpenConflict`). Warns when the head or base branch is missing. | writer |
+
+## Ref rules
+
+A repository's ref rules decide who can create, update, and delete each branch and tag. The
+first rule by `priority`, then by pattern length, decides; a ref that no rule matches is refused.
+Rules bind owners and admins too; there is no bypass, so an admin recovers by changing the rules.
+`-R/--repo` selects the repository (else `GITOSPHERE_REPO` or the checkout). A server without the
+methods exits 3 with `RulesetUnsupported`.
+
+| Command | Purpose | Who |
+| --- | --- | --- |
+| `ruleset list` | The rules in the order they are applied. JSON is `rules[]` with `pattern`, `minimumRole`, `allowCreate`, `allowUpdate`, `allowDelete`, `requireFastForward`, `requirePullRequest`, `requiredApprovals`, `priority`, `updatedAt`, `updatedBy`. | repository reader |
+| `ruleset view PATTERN` | One rule by its exact pattern; `RulesetNotFound` (exit 3) when there is none. | repository reader |
+| `ruleset check BRANCH` | The rule that applies to a branch (`refs/heads/BRANCH`) or a full ref such as `refs/tags/v1`. JSON `rule` is absent when no rule matches. | repository reader |
+| `ruleset set PATTERN` | Create the rule or change it; fields left out keep their values. `--min-role` (writer, admin, or owner), `--[no-]allow-create`, `--[no-]allow-update`, `--[no-]allow-delete`, `--[no-]require-fast-forward`, `--[no-]require-pull-request` (direct pushes may not update an existing branch; merges still can), `--required-approvals 0-10` (approvals a merge into the branch needs), `--priority 0-1000`. A new pattern needs `--min-role` and `--priority`. Patterns start with `refs/heads/` or `refs/tags/` and may end in `*`; pull request fields are for branches only, and a rule cannot both require pull requests and allow deletes. Requires `--idempotency-key`; supports `--dry-run`. Older push sessions fail with `git-push-policy-stale` after a change. | repository admin |
+| `ruleset delete PATTERN` | Delete the rule; refs only it matched are refused afterwards. Requires `--idempotency-key`; supports `--dry-run`. | repository admin |
 
 ## Mentions
 
