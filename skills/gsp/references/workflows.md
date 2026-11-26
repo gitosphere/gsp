@@ -195,9 +195,11 @@ Read review bodies and decisions with `pr reviews NUMBER --json`; the reviewer D
 `reviewer`, and `qualifying` marks the reviews the current decision counts. `pr status --json`
 lists the counted approvers in `approvers`.
 
-The current server fixes `requiredApprovals` at zero. A PR without qualifying
-approvals reports `not_required`, not `approved`; inspect `mergeable` and
-`blockingReasons` as well. Change requests, blocking findings, failed verification,
+`requiredApprovals` comes from the ref rule of the base branch; see it with
+`gsp ruleset check BRANCH`. A rule that requires approvals reports
+`review_required` until enough qualifying approvals arrive. When it requires none, a PR
+without qualifying approvals reports `not_required`, not `approved`. Inspect `mergeable`
+and `blockingReasons` as well. Change requests, blocking findings, failed verification,
 merge permissions, and head matching still apply. Older clients cannot decode
 `not_required`; install a compatible CLI before updating the server. Repository
 workflow instructions may still require a review independently of server policy.
